@@ -26,9 +26,30 @@ bool Application3D::startup() {
 
 	// create simple camera transforms
 	m_viewMatrix = glm::lookAt(vec3(10), vec3(0), vec3(0, 1, 0));
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f,
-										  getWindowWidth() / (float)getWindowHeight(),
-										  0.1f, 1000.f);
+	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.f);
+
+	// Load shader files
+	m_shader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
+	m_shader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/simple.frag");
+
+	// Check if there was any errors linking the shader files
+	if (m_shader.link() == false)
+	{
+		printf("Shader Error: %s\n", m_shader.getLastError());
+		return false;
+	}
+
+	// Initialise the quad's mesh
+	m_quadMesh.InitialiseQuad();
+
+	// Make the quad 10 units wide
+	m_quadTransform = 
+	{
+		10, 0, 0, 0,
+		0, 10, 0, 0,
+		0, 0, 10, 0,
+		0, 0, 0, 1
+	};
 
 	return true;
 }
@@ -50,36 +71,7 @@ void Application3D::update(float deltaTime) {
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();
 
-	// draw a simple grid with gizmos
-	vec4 white(1);
-	vec4 black(0, 0, 0, 1);
-	for (int i = 0; i < 21; ++i) {
-		Gizmos::addLine(vec3(-10 + i, 0, 10),
-						vec3(-10 + i, 0, -10),
-						i == 10 ? white : black);
-		Gizmos::addLine(vec3(10, 0, -10 + i),
-						vec3(-10, 0, -10 + i),
-						i == 10 ? white : black);
-	}
-
-	// add a transform so that we can see the axis
-	Gizmos::addTransform(mat4(1));
-
-	// demonstrate a few shapes
-	Gizmos::addAABBFilled(vec3(0), vec3(1), vec4(0, 0.5f, 1, 0.25f));
-	Gizmos::addSphere(vec3(5, 0, 5), 1, 8, 8, vec4(1, 0, 0, 0.5f));
-	Gizmos::addRing(vec3(5, 0, -5), 1, 1.5f, 8, vec4(0, 1, 0, 1));
-	Gizmos::addDisk(vec3(-5, 0, 5), 1, 16, vec4(1, 1, 0, 1));
-	Gizmos::addArc(vec3(-5, 0, -5), 0, 2, 1, 8, vec4(1, 0, 1, 1));
-
-	mat4 t = glm::rotate(mat4(1), time, glm::normalize(vec3(1, 1, 1)));
-	t[3] = vec4(-2, 0, 0, 1);
-	Gizmos::addCylinderFilled(vec3(0), 0.5f, 1, 5, vec4(0, 1, 1, 1), &t);
-
-	// demonstrate 2D gizmos
-	Gizmos::add2DAABB(glm::vec2(getWindowWidth() / 2, 100),
-					  glm::vec2(getWindowWidth() / 2 * (fmod(getTime(), 3.f) / 3), 20),
-					  vec4(0, 1, 1, 1));
+	drawGrid(true);
 
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
@@ -94,13 +86,38 @@ void Application3D::draw() {
 	clearScreen();
 
 	// update perspective in case window resized
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f,
-										  getWindowWidth() / (float)getWindowHeight(),
-										  0.1f, 1000.f);
+	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.f);
+
+	// Bind shader
+	m_shader.bind();
+
+	// Bind transform
+	auto pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
+	m_shader.bindUniform("ProjectionViewModel", pvm);
+
+	// Draw quad
+	m_quadMesh.Draw();
 
 	// draw 3D gizmos
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
 
 	// draw 2D gizmos using an orthogonal projection matrix (or screen dimensions)
 	Gizmos::draw2D((float)getWindowWidth(), (float)getWindowHeight());
+}
+
+void Application3D::drawGrid(bool doDraw)
+{
+	if (!doDraw) return;
+
+	// draw a simple grid with gizmos
+	vec4 white(1);
+	vec4 black(0, 0, 0, 1);
+	for (int i = 0; i < 21; ++i) {
+		Gizmos::addLine(vec3(-10 + i, 0, 10),
+			vec3(-10 + i, 0, -10),
+			i == 10 ? white : black);
+		Gizmos::addLine(vec3(10, 0, -10 + i),
+			vec3(-10, 0, -10 + i),
+			i == 10 ? white : black);
+	}
 }
