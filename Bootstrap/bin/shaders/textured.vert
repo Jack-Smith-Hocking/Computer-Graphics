@@ -10,5 +10,6 @@ uniform mat4 ProjectionViewModel;
 
 void main() 
 { 
-	vTexCoord = TexCoord; gl_Position = ProjectionViewModel * Position; 
+	vTexCoord = TexCoord; 
+	gl_Position = ProjectionViewModel * Position; 
 }

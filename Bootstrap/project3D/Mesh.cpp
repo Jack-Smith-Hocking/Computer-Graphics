@@ -31,7 +31,11 @@ void Mesh::Initialise(unsigned int vertexCount, const Vertex* vertices, unsigned
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
-	// Enable second element as texture coordinate
+	// Enable second element as normal
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)16);
+
+	// Enable third element as texture coordinate
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)32);
 
@@ -70,6 +74,14 @@ void Mesh::InitialiseQuad()
 	vertices[3].position = { -0.5f, 0, -0.5f, 1 };
 	vertices[4].position = { 0.5f, 0, 0.5f, 1 };
 	vertices[5].position = { 0.5f, 0, -0.5f, 1 };
+
+	// Define normals
+	vertices[0].normal = { 0, 1, 0, 0 };
+	vertices[1].normal = { 0, 1, 0, 0 };
+	vertices[2].normal = { 0, 1, 0, 0 };
+	vertices[3].normal = { 0, 1, 0, 0 };
+	vertices[4].normal = { 0, 1, 0, 0 };
+	vertices[5].normal = { 0, 1, 0, 0 };
 
 	// Define texture coordinates 
 	vertices[0].texCoord = { 0, 1 }; // Bottom left
