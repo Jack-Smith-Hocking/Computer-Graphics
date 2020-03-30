@@ -31,6 +31,10 @@ void Mesh::Initialise(unsigned int vertexCount, const Vertex* vertices, unsigned
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
+	// Enable second element as texture coordinate
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)32);
+
 	// Bind indices if there are any
 	if (indexCount != 0)
 	{
@@ -66,6 +70,15 @@ void Mesh::InitialiseQuad()
 	vertices[3].position = { -0.5f, 0, -0.5f, 1 };
 	vertices[4].position = { 0.5f, 0, 0.5f, 1 };
 	vertices[5].position = { 0.5f, 0, -0.5f, 1 };
+
+	// Define texture coordinates 
+	vertices[0].texCoord = { 0, 1 }; // Bottom left
+	vertices[1].texCoord = { 1, 1 }; // Bottom right
+	vertices[2].texCoord = { 0, 0 }; // Top left
+
+	vertices[3].texCoord = { 0, 0 }; // Top left
+	vertices[4].texCoord = { 1, 1 }; // Bottom right
+	vertices[5].texCoord = { 1, 0 }; // Top right
 
 	// Initialise a quad
 	Initialise(6, vertices);

@@ -9,7 +9,7 @@ public:
 	public:
 		glm::vec4 position = glm::vec4(0, 0, 0, 0);
 		glm::vec4 normal = glm::vec4(0, 0, 0, 0);
-		glm::vec4 texCoord = glm::vec4(0, 0, 0, 0);
+		glm::vec2 texCoord = glm::vec4(0, 0, 0, 0);
 	};
 
 	Mesh() : m_triCount(0), m_vao(0), m_vbo(0), m_ibo(0) {}

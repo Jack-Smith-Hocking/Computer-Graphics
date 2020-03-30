@@ -13,11 +13,8 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Shaders">
-      <UniqueIdentifier>{678c2a06-005b-4ea7-9700-b75b3d71de65}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Shaders">
-      <UniqueIdentifier>{b1a64b3b-5dc3-4dbb-b6b2-f755044c176b}</UniqueIdentifier>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{2673984a-572a-423e-9485-d331312a1952}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -27,10 +24,13 @@
     <ClCompile Include="Application3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files\Shaders</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OBJMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,11 +38,31 @@
     <ClInclude Include="Application3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OBJMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tiny_obj_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\bin\shaders\simple.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\bin\shaders\simple.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\bin\shaders\textured.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\bin\shaders\textured.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
