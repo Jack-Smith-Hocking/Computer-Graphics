@@ -3,6 +3,7 @@
 
 in vec4 vPosition;
 in vec3 vNormal;
+in vec2 vTexCoord;
 
 uniform vec3 Ia; // Ambient light colour
 uniform vec3 Id; // Diffuse light colour
@@ -17,6 +18,8 @@ uniform vec3 CameraPosition; // Position of the camera
 uniform float specularPower; // Material specular power
 
 uniform vec3 LightDirection;
+
+uniform sampler2D diffuseTexture;
 
 out vec4 FragColour;
 
@@ -42,5 +45,5 @@ void main()
 	vec3 specular = Is * Ks * specularTerm;
 
 	// output lambert as grayscale
-	FragColour = vec4( ambient + diffuse + specular, 1 );
+	FragColour = vec4( ambient + diffuse + specular, 1 ) + texture( diffuseTexture, vTexCoord );
 }

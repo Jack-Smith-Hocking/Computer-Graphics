@@ -4,6 +4,8 @@
 #include <glm/mat4x4.hpp>
 
 #include "Mesh.h"
+#include "Light.h"
+#include "Camera.h"
 #include "Shader.h"
 #include "OBJMesh.h"
 #include "Texture.h"
@@ -23,13 +25,6 @@ public:
 	void drawGrid(bool doDraw);
 
 protected:
-	
-	struct Light
-	{
-		glm::vec3			direction;
-		glm::vec3			diffuse;
-		glm::vec3			specular;
-	};
 
 	glm::mat4				m_viewMatrix;
 	glm::mat4				m_projectionMatrix;
@@ -50,4 +45,6 @@ protected:
 
 	Light					m_light;
 	glm::vec3				m_ambientLight;
+
+	Camera					m_camera;
 };

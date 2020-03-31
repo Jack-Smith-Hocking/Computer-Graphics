@@ -108,8 +108,10 @@ bool Application3D::startup() {
 		0, 0, 0, 1
 	};
 
-	m_light.diffuse = { 1, 1, 0 };
-	m_light.specular = { 1, 1, 0 };
+	m_light.m_direction = { 1, 0, 0 };
+	m_light.m_colour = { 0, 1, 0 };
+	m_light.m_diffuse = { 0, 1, 0 };
+	m_light.m_specular = { 1, 0, 0 };
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
 	return true;
@@ -129,12 +131,15 @@ void Application3D::update(float deltaTime) {
 	//m_viewMatrix = glm::lookAt(vec3(glm::sin(time) * 25, 10, glm::cos(time) * 25), vec3(0), vec3(0, 1, 0));
 
 	// rotate light
-	m_light.direction = glm::normalize(vec3(glm::cos(time * 2), glm::sin(time * 2), 0));
+	//m_light.m_direction = glm::normalize(vec3(glm::cos(time * 2), glm::sin(time * 2), 0));
 
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();
 
 	drawGrid(true);
+	m_light.Update(deltaTime);
+
+	m_camera.Update(deltaTime);
 
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
@@ -149,46 +154,55 @@ void Application3D::draw() {
 	clearScreen();
 
 	// update perspective in case window resized
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.f);
+	m_projectionMatrix = m_camera.GetProjectionMatrix(getWindowWidth(), getWindowHeight()); //glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.f);
+	m_viewMatrix = m_camera.GetViewMatrix();
 
 	// Bind shader
 	m_shader.bind();
-
-	// Bind textured Shader
-	m_texturedShader.bind();
-
-	// Bind phong shader
-	m_phongShader.bind();
 
 	// Bind transform
 	auto pvm = m_projectionMatrix * m_viewMatrix * m_spearTransform;
 	m_shader.bindUniform("ProjectionViewModel", pvm);
 
-	// Bind textured transform
-	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
-	// Bind texture location
-	m_texturedShader.bindUniform("diffuseTexture", 0);
+	{
+		// Bind phong shader
+		m_phongShader.bind();
 
-	// Bind the phong transform
-	m_phongShader.bindUniform("ProjectionViewModel", pvm);
-	// Bind the transform to rotate the normal by
-	m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_spearTransform)));
-	// Bind light
-	m_phongShader.bindUniform("Ia", m_ambientLight);
-	m_phongShader.bindUniform("Id", m_light.diffuse);
-	m_phongShader.bindUniform("Is", m_light.specular);
-	m_phongShader.bindUniform("LightDirection", m_light.direction);
-	// Bind camera position
-	m_phongShader.bindUniform("CameraPosition", vec3(glm::inverse(m_viewMatrix)[3]));
+		// Bind the phong transform
+		m_phongShader.bindUniform("ProjectionViewModel", pvm);
+		// Bind the transform to rotate the normal by
+		m_phongShader.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_spearTransform)));
+		// Bind light
+		m_phongShader.bindUniform("Ia", m_ambientLight);
+		m_phongShader.bindUniform("Id", m_light.m_diffuse);
+		m_phongShader.bindUniform("Is", m_light.m_specular);
+		m_phongShader.bindUniform("LightDirection", m_light.m_direction);
+		// Bind camera position
+		m_phongShader.bindUniform("CameraPosition", vec3(glm::inverse(m_viewMatrix)[3]));
 
-	// Bind texture to specified location
-	m_gridTexture.bind(0);
+		//m_bunnyMesh.draw();
 
-	// Draw quad
-	m_quadMesh.Draw();
-	//m_bunnyMesh.draw();
+		m_spearMesh.draw();
+	}
 
-	m_spearMesh.draw();
+	// Bind transform
+	pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
+	m_shader.bindUniform("ProjectionViewModel", pvm);
+	{
+		// Bind textured Shader
+		//m_texturedShader.bind();
+
+		// Bind textured transform
+		m_texturedShader.bindUniform("ProjectionViewModel", pvm);
+		// Bind texture location
+		m_texturedShader.bindUniform("diffuseTexture", 0);
+
+		// Bind texture to specified location
+		m_gridTexture.bind(0);
+
+		// Draw quad
+		m_quadMesh.Draw();
+	}
 
 	// draw 3D gizmos
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
