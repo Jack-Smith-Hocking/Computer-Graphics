@@ -22,7 +22,7 @@ public:
 	virtual void update(float deltaTime);
 	virtual void draw();
 
-	void drawGrid(bool doDraw);
+	void drawGrid(int halfGridSize = 10, bool doDraw = true);
 
 protected:
 
@@ -30,8 +30,8 @@ protected:
 	glm::mat4				m_projectionMatrix;
 
 	aie::ShaderProgram		m_shader;
-	aie::ShaderProgram		m_texturedShader;
-	aie::ShaderProgram		m_phongShader;
+	aie::ShaderProgram		m_phongUntextured;
+	aie::ShaderProgram		m_phongTextured;
 
 	aie::Texture			m_gridTexture;
 	Mesh					m_quadMesh;
@@ -43,8 +43,9 @@ protected:
 	aie::OBJMesh			m_spearMesh;
 	glm::mat4				m_spearTransform;
 
-	Light					m_light;
+	Light*					m_light;
 	glm::vec3				m_ambientLight;
 
-	Camera					m_camera;
+	Camera*					m_camera;
+	Scene* m_scene;
 };

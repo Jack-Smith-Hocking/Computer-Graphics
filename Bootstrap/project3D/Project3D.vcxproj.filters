@@ -39,6 +39,12 @@
     <ClCompile Include="Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="InteractiveMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application3D.h">
@@ -62,6 +68,12 @@
     <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="InteractiveMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\bin\shaders\simple.frag">
@@ -76,10 +88,16 @@
     <None Include="..\bin\shaders\textured.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\bin\shaders\phong.vert">
+    <None Include="..\bin\shaders\phongTextured.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\bin\shaders\phong.frag">
+    <None Include="..\bin\shaders\phongTextured.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\bin\shaders\phongUntextured.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\bin\shaders\phongUntextured.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

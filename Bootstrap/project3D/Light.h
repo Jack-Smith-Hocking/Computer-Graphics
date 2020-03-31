@@ -1,15 +1,15 @@
 #pragma once
 #include <glm\ext.hpp>
+#include "InteractiveMenu.h"
 
-class Light
+class Light : public InteractiveMenu
 {
 public:
+	Light(glm::vec3 position, glm::vec3 colour, float radius);
 
-	void Update(float deltaTime);
+	void Update(float deltaTime) override;
 
 	glm::vec3 m_colour;
-	glm::vec3 m_direction;
-	glm::vec3 m_diffuse;
-	glm::vec3 m_specular;
+	glm::vec3 m_position;
 };
 
