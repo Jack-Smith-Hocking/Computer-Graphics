@@ -3,13 +3,15 @@
 #include "Interactive.h"
 #include "Application3D.h"
 #include "Scene.h"
-#include "Light.h"
 #include "Gizmos.h"
+
+#include "Light.h"
+#include "Model.h"
 
 extern unsigned int g_windowHeight;
 extern unsigned int g_windowWidth;
 
-Camera::Camera(Scene* scene) : m_scene(scene)
+Camera::Camera()
 {
 	m_input = aie::Input::getInstance();
 }
@@ -178,40 +180,12 @@ void Camera::SelectTarget()
 		// The closes viable light from m_position
 		float closestDist = 1000000000;
 
-		// Vector between the ray origin and the centre of the collision sphere
-		glm::vec3 L;
+		closestInteractive = EvaluateTargets(m_scene->m_lights, dir, closestDist);
+		Interactive* temp = EvaluateTargets(m_scene->m_models, dir, closestDist);
 
-		// Closest point #distance that is perpendicular to the centre of the sphere
-		float closestDistToCentre = 0;
-
-		float d = 0;
-
-		// Start point of the ray
-		glm::vec3 origin = m_position;
-
-		for each (Light* light in m_scene->m_lights)
+		if (temp != nullptr)
 		{
-			L = light->m_position - m_position;
-			closestDistToCentre = glm::dot(L, dir);
-
-			if (closestDistToCentre < 0)
-			{
-				continue;
-			}
-
-			d = glm::dot(L, L) - (closestDistToCentre * closestDistToCentre);
-			if (d < 0 || d > (light->m_radius * light->m_radius))
-			{
-				continue;
-			}
-
-			float tempDist = glm::distance(light->m_position, m_position);
-
-			if (tempDist < closestDist)
-			{
-				closestDist = tempDist;
-				closestInteractive = light;
-			}
+			closestInteractive = temp;
 		}
 
 		if (closestInteractive != nullptr)
@@ -228,6 +202,56 @@ void Camera::SelectTarget()
 	else
 	{
 		printf("The scene given to the camera was nullptr, no raycast performed!");
+	}
+}
+
+Interactive* Camera::EvaluateTargets(const std::vector<Interactive*>& interactables, const glm::vec3& dir, float& closestDist)
+{
+	// Vector between the ray origin and the centre of the collision sphere
+	glm::vec3 L;
+
+	// Closest point #distance that is perpendicular to the centre of the sphere
+	float closestDistToCentre = 0;
+
+	float d = 0;
+
+	// Start point of the ray
+	glm::vec3 origin = m_position;
+
+	for each (Interactive* interactable in interactables)
+	{
+		L = interactable->m_position - m_position;
+		closestDistToCentre = glm::dot(L, dir);
+
+		if (closestDistToCentre < 0)
+		{
+			continue;
+		}
+
+		d = glm::dot(L, L) - (closestDistToCentre * closestDistToCentre);
+		if (d < 0 || d >(interactable->GetRadius() * interactable->GetRadius()))
+		{
+			continue;
+		}
+
+		float tempDist = glm::distance(interactable->m_position, m_position);
+
+		if (tempDist < closestDist)
+		{
+			closestDist = tempDist;
+
+			return interactable;
+		}
+	}
+
+	return nullptr;
+}
+
+void Camera::SetScene(Scene* scene)
+{
+	if (scene != nullptr)
+	{
+		m_scene = scene;
 	}
 }
 

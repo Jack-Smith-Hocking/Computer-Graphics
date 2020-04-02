@@ -23,21 +23,21 @@ uniform sampler2D diffuseTexture;
 
 out vec4 FragColour;
 
-vec3 DiffuseLight(vec3 N, vec3 lightDir, int index)
+vec3 DiffuseLight(vec3 N, vec3 lightDir, vec3 intensity)
 {
 	vec3 L = normalize(lightDir);
 
-	return  max( 0, min( 1, dot( N, -L ) ) ) * LightColour[index] * LightIntensity[index];
+	return  max( 0, min( 1, dot( N, -L ) ) ) * intensity;
 }
 
-vec3 SpecularLight(vec3 N, vec3 lightDir, int index)
+vec3 SpecularLight(vec3 N, vec3 lightDir, vec3 intensity)
 {
 	// Calculate view vector and reflection vector
 	vec3 L = normalize(lightDir);
 	vec3 V = normalize( CameraPosition - vPosition.xyz );
 	vec3 R = reflect( L, N );
 
-	return pow( max( 0, dot( R, V ) ), specularPower) * vec3(1, 1, 1) * LightIntensity[index];
+	return pow( max( 0, dot( R, V ) ), specularPower) * intensity;
 }
 
 void main() 
@@ -46,6 +46,8 @@ void main()
 	vec3 N = normalize(vNormal);
 
 	vec3 lightDirection= vec3(0, 0, 0);
+	vec3 toLight = vec3(0, 0, 0);
+	vec3 intensity = vec3(0, 0, 0);
 
 	// calculate lambert term (negate light direction)
 	vec3 lambertTerm = vec3(0, 0, 0);
@@ -55,12 +57,21 @@ void main()
 	vec3 diffuse = vec3(0, 0, 0);
 	vec3 specular = vec3(0, 0, 0);
 
+	float distanceSqrd = 0;
+	float attenuation = 0;
+
 	for (int i = 0; i < 8; i++)
 	{
-		lightDirection =  normalize(vPosition.xyz - LightPosition[i]);
+		toLight = vec3(vPosition) - LightPosition[i];
+		lightDirection =  normalize(toLight);
 
-		lambertTerm += DiffuseLight(N, lightDirection, i);
-		specularTerm += SpecularLight(N, lightDirection, i); 
+		distanceSqrd = dot(toLight, toLight);
+		attenuation = 1.0; // distanceSqrd;
+
+		intensity = (LightColour[i] * (LightIntensity[i] * LightIntensity[i])) * attenuation;
+
+		lambertTerm += DiffuseLight(N, lightDirection, intensity);
+		specularTerm += SpecularLight(N, lightDirection, intensity); 
 
 		diffuse += LightColour[i] * Kd * lambertTerm;
 		specular += LightColour[i] * Ks * specularTerm;

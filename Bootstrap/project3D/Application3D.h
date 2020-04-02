@@ -9,6 +9,7 @@
 #include "Shader.h"
 #include "OBJMesh.h"
 #include "Texture.h"
+#include "Model.h"
 
 class Application3D : public aie::Application {
 public:
@@ -22,31 +23,22 @@ public:
 	virtual void update(float deltaTime);
 	virtual void draw();
 
-	void drawGrid(int halfGridSize = 10, bool doDraw = true);
-
 protected:
 
 	glm::mat4				m_viewMatrix;
 	glm::mat4				m_projectionMatrix;
 
-	aie::ShaderProgram		m_shader;
-	aie::ShaderProgram		m_phongUntextured;
-	aie::ShaderProgram		m_phongTextured;
-
-	aie::Texture			m_gridTexture;
-	Mesh					m_quadMesh;
-	glm::mat4				m_quadTransform;
-
-	aie::OBJMesh			m_bunnyMesh;
-	glm::mat4				m_bunnyTransform;
+	aie::ShaderProgram*		m_phongTextured;
 
 	aie::OBJMesh			m_spearMesh;
 	glm::mat4				m_spearTransform;
 
 	Light*					m_light;
-	Light* m_light2;
+	Light*					m_light2;
 	glm::vec3				m_ambientLight;
 
 	Camera*					m_camera;
-	Scene* m_scene;
+	Scene*					m_scene;
+
+	Model*					m_spear = nullptr;
 };

@@ -5,12 +5,14 @@
 class Light : public Interactive
 {
 public:
-	Light(glm::vec3 position, glm::vec3 colour, float radius);
+	Light(glm::vec3 position, glm::vec3 colour);
 
 	void Update(float deltaTime) override;
+	void Draw(Scene* scene) override;
 
 	glm::vec3 m_colour;
-	glm::vec3 m_position;
+
+	bool m_enabled;
 
 	float m_intensity = 1;
 };

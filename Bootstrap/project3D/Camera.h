@@ -28,7 +28,7 @@ public:
 		glm::vec4 colour = glm::vec4(1, 1, 1, 1);
 	};
 
-	Camera(Scene* scene);
+	Camera();
 
 	void Update(float deltaTime);
 
@@ -36,6 +36,9 @@ public:
 
 	glm::vec3 GetForward();
 	void SelectTarget();
+	Interactive* EvaluateTargets(const std::vector<Interactive*>& interactables, const glm::vec3& dir, float& closestDist);
+
+	void SetScene(Scene* scene);
 
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix(float w, float h);
