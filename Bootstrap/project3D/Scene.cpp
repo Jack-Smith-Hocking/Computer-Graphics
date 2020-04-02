@@ -36,10 +36,12 @@ void Scene::Update(float deltaTime)
 	for each (Light* light in m_lights)
 	{
 		light->Update(deltaTime);
+		light->ToggleCollider(m_debugInfo.showColliders);
 	}
 	for each (Interactive * model in m_models)
 	{
 		model->Update(deltaTime);
+		model->ToggleCollider(m_debugInfo.showColliders);
 	}
 }
 
@@ -70,6 +72,7 @@ void Scene::UpdateImGui()
 	}
 
 	ImGui::Begin("Scene Settings");
+	ImGui::Checkbox("Show Colliders", &m_debugInfo.showColliders);
 	ImGui::Checkbox("Show Grid", &m_gridInfo.drawGrid);
 
 	if (m_gridInfo.drawGrid)

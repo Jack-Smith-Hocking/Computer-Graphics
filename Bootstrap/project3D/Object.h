@@ -7,6 +7,7 @@ class Object
 {
 public:
 	Object(glm::vec3 pos = glm::vec3(0, 0, 0), glm::vec3 euler = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1));
+	virtual ~Object();
 
 	virtual void Update(float deltaTime);
 	virtual void Draw(Scene* scene);

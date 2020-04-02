@@ -44,8 +44,13 @@ private:
 		
 		glm::vec3 colour = glm::vec3(0, 0, 0);
 	};
+	struct DebugInformation
+	{
+		bool showColliders = true;
+	};
 
 	GridInformation m_gridInfo;
+	DebugInformation m_debugInfo;
 
 	Camera* m_mainCamera = nullptr;
 	std::vector<Light*> m_availableLights; 

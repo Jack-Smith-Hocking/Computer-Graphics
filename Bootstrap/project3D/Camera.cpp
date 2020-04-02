@@ -220,7 +220,7 @@ Interactive* Camera::EvaluateTargets(const std::vector<Interactive*>& interactab
 
 	for each (Interactive* interactable in interactables)
 	{
-		L = interactable->m_position - m_position;
+		L = interactable->GetOffsetPosition() - m_position;
 		closestDistToCentre = glm::dot(L, dir);
 
 		if (closestDistToCentre < 0)
@@ -234,7 +234,7 @@ Interactive* Camera::EvaluateTargets(const std::vector<Interactive*>& interactab
 			continue;
 		}
 
-		float tempDist = glm::distance(interactable->m_position, m_position);
+		float tempDist = glm::distance(interactable->GetOffsetPosition(), m_position);
 
 		if (tempDist < closestDist)
 		{

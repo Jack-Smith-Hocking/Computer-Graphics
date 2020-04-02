@@ -92,6 +92,11 @@ void Application3D::shutdown() {
 
 void Application3D::update(float deltaTime) {
 
+	if (ImGui::IsWindowCollapsed())
+	{
+		return;
+	}
+
 	// query time since application started
 	float time = getTime();
 
@@ -114,6 +119,11 @@ void Application3D::draw() {
 
 	// wipe the screen to the background colour
 	clearScreen();
+
+	if (ImGui::IsWindowCollapsed())
+	{
+		return;
+	}
 
 	// update perspective in case window resized
 	m_projectionMatrix = m_scene->GetProjectionMatrix();

@@ -39,7 +39,7 @@ void Light::Update(float deltaTime)
 	m_radius = 0.5f + m_intensity * 0.01f;
 	
 	// Draw light visualisation
-	aie::Gizmos::addSphere(m_position, m_radius, 16, 8, glm::vec4(m_colour, (m_enabled ? 1 : 0.5f)));
+	aie::Gizmos::addSphere(m_position, m_radius, 16, 8, glm::vec4(m_colour, (m_enabled ? 1 : 0.3f)));
 }
 
 void Light::Draw(Scene* scene)

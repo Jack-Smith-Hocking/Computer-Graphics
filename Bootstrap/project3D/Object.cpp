@@ -5,6 +5,10 @@ Object::Object(glm::vec3 pos, glm::vec3 euler, glm::vec3 scale) : m_position(pos
 	UpdateTransform();
 }
 
+Object::~Object()
+{
+}
+
 void Object::Update(float deltaTime)
 {
 	UpdateTransform();
