@@ -6,7 +6,9 @@ in vec3 vNormal;
 in vec2 vTexCoord;
 
 uniform vec3 Ia; // Ambient light colour
-uniform vec3 colour;
+
+uniform vec3 LightColour; 
+uniform vec3 LightPosition;
 
 uniform vec3 Ka; // Ambient material colour
 uniform vec3 Kd; // Diffuse material colour
@@ -15,8 +17,6 @@ uniform vec3 Ks; // Specular material colour
 uniform vec3 CameraPosition; // Position of the camera
 
 uniform float specularPower; // Material specular power
-
-uniform vec3 LightPosition;
 
 uniform sampler2D diffuseTexture;
 
@@ -42,8 +42,8 @@ void main()
 
 	// Calculate each colour property
 	vec3 ambient = Ia * Ka;
-	vec3 diffuse = colour * Kd * lambertTerm;
-	vec3 specular = colour * Ks * specularTerm;
+	vec3 diffuse = LightColour * Kd * lambertTerm;
+	vec3 specular = LightColour * Ks * specularTerm;
 
 	// output lambert as grayscale
 	FragColour = vec4( ambient + diffuse + specular, 1 ) + texture( diffuseTexture, vTexCoord );

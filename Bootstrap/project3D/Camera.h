@@ -2,27 +2,39 @@
 #include <glm\ext.hpp>
 #include "Input.h"
 
-class InteractiveMenu;
+class Interactive;
 class Scene;
-
-struct RayInfo
-{
-	glm::vec3 direction;
-	glm::vec3 start;
-	glm::vec3 end;
-
-	glm::vec2 mousePos;
-};
 
 class Camera
 {
 public:
 
+	struct DebugInformation
+	{
+		bool showDebug = true;
+		bool showSphere = true;
+
+		glm::vec3 position;
+		glm::vec3 forward;
+		
+		glm::vec4 lineColour = glm::vec4(1, 1, 1, 1);
+	};
+	struct CrosshairInformation
+	{
+		bool showCrosshair = true;
+
+		float size = 10;
+
+		glm::vec4 colour = glm::vec4(1, 1, 1, 1);
+	};
+
 	Camera(Scene* scene);
 
 	void Update(float deltaTime);
 
-	RayInfo ProjectRay(float maxDistance, bool debug = false);
+	void DrawMenu();
+
+	glm::vec3 GetForward();
 	void SelectTarget();
 
 	glm::mat4 GetViewMatrix();
@@ -38,6 +50,9 @@ private:
 	float m_turnSpeed = 0.1f;
 	float m_moveSpeed = 7.5f;
 
+	float m_scrollSpeed = 1;
+	float m_scrollWheelMove = 0;
+
 	bool m_invertVertical = false;
 	bool m_invertHorizontal = false;
 
@@ -45,9 +60,10 @@ private:
 
 	glm::vec3 m_position = glm::vec3(10, 10, 10);
 
-	Scene* m_scene = nullptr;
-	InteractiveMenu* m_currentMenu = nullptr;
+	DebugInformation m_debugInfo;
+	CrosshairInformation m_crosshairInfo;
 
-	RayInfo m_currentRay;
+	Scene* m_scene = nullptr;
+	Interactive* m_currentMenu = nullptr;
 };
 

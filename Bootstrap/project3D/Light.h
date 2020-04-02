@@ -1,8 +1,8 @@
 #pragma once
 #include <glm\ext.hpp>
-#include "InteractiveMenu.h"
+#include "Interactive.h"
 
-class Light : public InteractiveMenu
+class Light : public Interactive
 {
 public:
 	Light(glm::vec3 position, glm::vec3 colour, float radius);

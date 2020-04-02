@@ -1,13 +1,13 @@
 #include "Camera.h"
 #include "imgui.h"
-#include "InteractiveMenu.h"
+#include "Interactive.h"
 #include "Application3D.h"
 #include "Scene.h"
 #include "Light.h"
 #include "Gizmos.h"
 
-extern unsigned int WindowHeight;
-extern unsigned int WindowWidth;
+extern unsigned int g_windowHeight;
+extern unsigned int g_windowWidth;
 
 Camera::Camera(Scene* scene) : m_scene(scene)
 {
@@ -16,61 +16,60 @@ Camera::Camera(Scene* scene) : m_scene(scene)
 
 void Camera::Update(float deltaTime)
 {
-	ImGui::Begin("Camera Settings");
-	ImGui::Checkbox("Invert Vertical", &m_invertVertical);
-	ImGui::Checkbox("Invert Horizontal", &m_invertHorizontal);
-	ImGui::Spacing();
-	ImGui::SliderFloat("Turn Speed", &m_turnSpeed, 0.0f, 1.0f);
-	ImGui::SliderFloat("Move Speed", &m_moveSpeed, 0.0f, 10.0f);
-	ImGui::End();
+	DrawMenu();
 
 	float thetaR = glm::radians(m_theta);
 	float phiR = glm::radians(m_phi);
 
 	// Calculate the forwards for the right axis and up axis for the camera
-	glm::vec3 forward(cos(phiR) * cos(thetaR), sin(phiR), cos(phiR) * sin(thetaR));
+	glm::vec3 forward = GetForward();
 	glm::vec3 right(-sin(thetaR), 0, cos(thetaR));
 	glm::vec3 up(0, 1, 0);
 
-	float moveSpeed = deltaTime * m_moveSpeed;
+	forward *= deltaTime;
+	right *= deltaTime;
+	up *= deltaTime;
+
+	float scrollThisFrame = m_input->getMouseScroll() - m_scrollWheelMove;
+	m_scrollWheelMove = m_input->getMouseScroll();
 
 	// Use WASD, ZX keys to move camera around
 	if (m_input->isKeyDown(aie::INPUT_KEY_X))
 	{
-		m_position += up * moveSpeed;
+		m_position += up * m_moveSpeed;
 	}
 	if (m_input->isKeyDown(aie::INPUT_KEY_Z))
 	{
-		m_position -= up * moveSpeed;
+		m_position -= up * m_moveSpeed;
 	}
-	if (m_input->isKeyDown(aie::INPUT_KEY_W))
+	if (m_input->isKeyDown(aie::INPUT_KEY_W) || scrollThisFrame > 0)
 	{
-		m_position += forward * moveSpeed;
+		m_position += forward * (scrollThisFrame > 0 ? m_scrollSpeed / deltaTime : m_moveSpeed);
 	}
-	if (m_input->isKeyDown(aie::INPUT_KEY_S))
+	if (m_input->isKeyDown(aie::INPUT_KEY_S) || scrollThisFrame < 0)
 	{
-		m_position -= forward * moveSpeed;
+		m_position -= forward * (scrollThisFrame < 0 ? m_scrollSpeed / deltaTime : m_moveSpeed);
 	}
 	if (m_input->isKeyDown(aie::INPUT_KEY_D))
 	{
-		m_position += right * moveSpeed;
+		m_position += right * m_moveSpeed;
 	}
 	if (m_input->isKeyDown(aie::INPUT_KEY_A))
 	{
-		m_position -= right * moveSpeed;
+		m_position -= right * m_moveSpeed;
 	}
 
 	// Get current mouse coordinates 
 	float mx = m_input->getMouseX();
 	float my = m_input->getMouseY();
 
-	if (m_input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT))
+	if (m_input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_RIGHT))
 	{
 		SelectTarget();
 	}
 
 	// If the right button is down increment theta and phi
-	if (m_input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_RIGHT))
+	if (m_input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_MIDDLE))
 	{
 		m_theta += (m_invertHorizontal ? -1 : 1) * (m_turnSpeed * (mx - m_lastMouseX));
 		m_phi += (m_invertVertical ? -1 : 1) * (m_turnSpeed * (my - m_lastMouseY));
@@ -82,80 +81,118 @@ void Camera::Update(float deltaTime)
 	m_lastMouseX = mx;
 	m_lastMouseY = my;
 
-	aie::Gizmos::addLine(m_currentRay.start, m_currentRay.end, glm::vec4(1, 1, 1, 1));
-	aie::Gizmos::addSphere(m_currentRay.start, 1, 16, 8, glm::vec4(1, 1, 1, 0));
+	// Add Gizmos
+	{
+		glm::vec2 mousePos = glm::vec2(g_windowWidth / 2, g_windowHeight / 2);
 
-	aie::Gizmos::add2DCircle(m_currentRay.mousePos, 10, 12, glm::vec4(1, 1, 1, 1));
+		if (m_debugInfo.showDebug)
+		{
+			aie::Gizmos::addLine(m_debugInfo.position, m_debugInfo.position + m_debugInfo.forward * 100.0f, m_debugInfo.lineColour);
+			if (m_debugInfo.showSphere)
+			{
+				aie::Gizmos::addSphere(m_position, 1, 16, 8, glm::vec4(1, 1, 1, 0));
+			}
+		}
 
-	aie::Gizmos::addSphere(m_position, 1, 16, 8, glm::vec4(1, 1, 1, 1));
-
-	aie::Gizmos::add2DCircle(glm::vec2(0, 0), 4, 12, glm::vec4(1, 1, 1, 1));
+		if (m_crosshairInfo.showCrosshair)
+		{
+			aie::Gizmos::add2DCircle(mousePos, m_crosshairInfo.size, 12, m_crosshairInfo.colour);
+		}
+	}
 }
 
-RayInfo Camera::ProjectRay(float maxDistance, bool debug)
+void Camera::DrawMenu()
 {
-	// Get mouse point
-	float mx = (2 * m_input->getMouseX() / WindowWidth) - 1.0f;
-	float my = (2 * m_input->getMouseY() / WindowHeight) - 1.0f;
+	ImGui::Begin("Camera Settings");
 
-	//glm::mat4 invVP = glm::inverse(GetProjectionMatrix(WindowWidth, WindowHeight) * GetViewMatrix());
+	ImGui::Checkbox("Show Debug", &m_debugInfo.showDebug);
+	if (m_debugInfo.showDebug)
+	{
+		ImGui::Indent();
 
-	//glm::vec4 screenPos = glm::vec4(mx, -my, 1.0f, 1.0f);
-	//glm::vec4 worldPos = invVP * screenPos;
+		ImGui::Checkbox("Show Wire Cage", &m_debugInfo.showSphere);
 
-	//glm::vec3 dir = glm::vec3(worldPos);
+		ImGui::SliderFloat3("Line Colour", &m_debugInfo.lineColour[0], 0, 1);
 
-	glm::vec4 ray_clip(mx,  my, -1.0f, 1.0f);
-	glm::vec4 ray_eye = glm::inverse(GetProjectionMatrix(WindowWidth, WindowHeight)) * ray_clip;
-	ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0f, 0.0f);
+		ImGui::Spacing();
+		ImGui::Spacing();
 
-	glm::vec3 ray_world = glm::vec3(glm::inverse(GetViewMatrix()) * ray_eye);
-	ray_world = glm::normalize(ray_world);
+		ImGui::Unindent();
+		ImGui::Separator();
 
-	RayInfo rayInfo;
-	rayInfo.direction = ray_world;
-	rayInfo.start = m_position;
-	rayInfo.end = m_position + ray_world * maxDistance;
-	//rayInfo.mousePos = glm::vec2(m_input->getMouseX(), m_input->getMouseY());
-	rayInfo.mousePos = glm::vec2(mx, my);
+		ImGui::Spacing();
+		ImGui::Spacing();
+	}
 
-	m_currentRay = rayInfo;
+	ImGui::Checkbox("Show Crosshair", &m_crosshairInfo.showCrosshair);
+	if (m_crosshairInfo.showCrosshair)
+	{
+		ImGui::Indent();
 
-	return rayInfo;
+		ImGui::SliderFloat("Size", &m_crosshairInfo.size, 0, 20);
+
+		ImGui::SliderFloat3("Crosshair Colour", &m_crosshairInfo.colour[0], 0, 1);
+
+		ImGui::Spacing();
+		ImGui::Spacing();
+
+		ImGui::Unindent();
+		ImGui::Separator();
+
+		ImGui::Spacing();
+		ImGui::Spacing();
+	}
+
+	ImGui::Checkbox("Invert Vertical", &m_invertVertical);
+	ImGui::Checkbox("Invert Horizontal", &m_invertHorizontal);
+
+	ImGui::Spacing();
+	ImGui::Spacing();
+
+	ImGui::SliderFloat("Turn Speed", &m_turnSpeed, 0.0f, 0.5f);
+	ImGui::SliderFloat("Move Speed", &m_moveSpeed, 0.0f, 20.0f);
+	ImGui::SliderFloat("Scroll Speed", &m_scrollSpeed, 0.0f, 20.0f);
+	ImGui::End();
+}
+
+glm::vec3 Camera::GetForward()
+{
+	// Calculate the forward 
+	float thetaR = glm::radians(m_theta);
+	float phiR = glm::radians(m_phi);
+	glm::vec3 forward(cos(phiR) * cos(thetaR), sin(phiR), cos(phiR) * sin(thetaR));
+
+	return glm::normalize(forward);
 }
 
 void Camera::SelectTarget()
 {
 	if (m_scene != nullptr)
 	{
-		RayInfo rayInfo = ProjectRay(100, true);
+		glm::vec3 dir = GetForward();
+		
+		m_debugInfo.forward = dir;
+		m_debugInfo.position = m_position;
 
-		if (m_currentMenu != nullptr)
-		{
-			m_currentMenu->m_showMenu = false;
-			m_currentMenu = nullptr;
-		}
+		Interactive* closestInteractive = nullptr;
 
-		InteractiveMenu* closestMenu = nullptr;
+		// The closes viable light from m_position
 		float closestDist = 1000000000;
 
 		// Vector between the ray origin and the centre of the collision sphere
 		glm::vec3 L;
 
-		// Closest distance that is perpendicular to the centre of the sphere
+		// Closest point #distance that is perpendicular to the centre of the sphere
 		float closestDistToCentre = 0;
 
 		float d = 0;
 
-		// Direction the ray is travelling
-		glm::vec3 dir = rayInfo.direction;
-
 		// Start point of the ray
-		glm::vec3 origin = rayInfo.start;
+		glm::vec3 origin = m_position;
 
-		for each (Light* l in m_scene->m_lights)
+		for each (Light* light in m_scene->m_lights)
 		{
-			L = l->m_position - dir;
+			L = light->m_position - m_position;
 			closestDistToCentre = glm::dot(L, dir);
 
 			if (closestDistToCentre < 0)
@@ -163,23 +200,30 @@ void Camera::SelectTarget()
 				continue;
 			}
 
-			d = glm::sqrt(glm::dot(L, L) - glm::dot(dir, dir));
-			if (d < 0 || d > l->m_radius)
+			d = glm::dot(L, L) - (closestDistToCentre * closestDistToCentre);
+			if (d < 0 || d > (light->m_radius * light->m_radius))
 			{
 				continue;
 			}
 
-			if (d < closestDist)
+			float tempDist = glm::distance(light->m_position, m_position);
+
+			if (tempDist < closestDist)
 			{
-				closestDist = d;
-				closestMenu = l;
+				closestDist = tempDist;
+				closestInteractive = light;
 			}
 		}
 
-		if (closestMenu != nullptr)
+		if (closestInteractive != nullptr)
 		{
-			m_currentMenu = closestMenu;
-			m_currentMenu->m_showMenu = true;
+			if (m_currentMenu != nullptr)
+			{
+				m_currentMenu->OffClick();
+			}
+
+			m_currentMenu = closestInteractive;
+			m_currentMenu->OnClick();
 		}
 	}
 	else

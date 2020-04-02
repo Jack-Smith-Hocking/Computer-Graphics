@@ -4,14 +4,17 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include "Scene.h"
+#include "imgui.h"
 
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
 using aie::Gizmos;
 
-unsigned int WindowHeight;
-unsigned int WindowWidth;
+unsigned int g_windowHeight;
+unsigned int g_windowWidth;
+
+int g_gridSize;
 
 Application3D::Application3D() {
 
@@ -113,15 +116,19 @@ bool Application3D::startup() {
 	};
 
 	m_light = new Light(glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), 2);
+	m_light2 = new Light(glm::vec3(10, 0, 0), glm::vec3(1, 0, 0), 2);
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
 	m_scene = new Scene();
 	m_scene->AddLight(m_light);
+	m_scene->AddLight(m_light2);
 
 	m_camera = new Camera(m_scene);
 	
-	WindowHeight = getWindowHeight();
-	WindowWidth = getWindowWidth();
+	g_windowHeight = getWindowHeight();
+	g_windowWidth = getWindowWidth();
+
+	g_gridSize = 20;
 
 	return true;
 }
@@ -136,22 +143,20 @@ void Application3D::update(float deltaTime) {
 	// query time since application started
 	float time = getTime();
 
-	// rotate camera
-	//m_viewMatrix = glm::lookAt(vec3(glm::sin(time) * 25, 10, glm::cos(time) * 25), vec3(0), vec3(0, 1, 0));
-
-	// rotate light
-	//m_light.m_direction = glm::normalize(vec3(glm::cos(time * 2), glm::sin(time * 2), 0));
+	ImGui::Begin("Scene Settings");
+	ImGui::SliderInt("Grid Size", &g_gridSize, 10, 250);
+	ImGui::End();
 
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();
 
-	drawGrid(20, true);
-	m_light->Update(deltaTime);
+	drawGrid(g_gridSize, true);
+	m_scene->Update(deltaTime);
 
 	m_camera->Update(deltaTime);
 
-	WindowHeight = getWindowHeight();
-	WindowWidth = getWindowWidth();
+	g_windowHeight = getWindowHeight();
+	g_windowWidth = getWindowWidth();
 
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
@@ -186,7 +191,7 @@ void Application3D::draw() {
 		m_phongTextured.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_spearTransform)));
 		// Bind light
 		m_phongTextured.bindUniform("Ia", m_ambientLight);
-		m_phongTextured.bindUniform("colour", m_light->m_colour);
+		m_phongTextured.bindUniform("LightColour", m_light->m_colour);
 		m_phongTextured.bindUniform("LightPosition", m_light->m_position);
 		// Bind camera position
 		m_phongTextured.bindUniform("CameraPosition", vec3(glm::inverse(m_viewMatrix)[3]));

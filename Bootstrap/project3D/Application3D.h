@@ -44,6 +44,7 @@ protected:
 	glm::mat4				m_spearTransform;
 
 	Light*					m_light;
+	Light* m_light2;
 	glm::vec3				m_ambientLight;
 
 	Camera*					m_camera;
