@@ -11,5 +11,7 @@ public:
 
 	glm::vec3 m_colour;
 	glm::vec3 m_position;
+
+	float m_intensity = 1;
 };
 

@@ -16,16 +16,16 @@ void Light::Update(float deltaTime)
 		ImGui::Begin("Light Settings");
 		ImGui::SliderFloat3("Position", &m_position[0], -g_gridSize, g_gridSize);
 		ImGui::SliderFloat3("Colour", &m_colour[0], 0, 1);
+
+		ImGui::Spacing();
+		ImGui::Spacing();
+
+		ImGui::SliderFloat("Intensity", &m_intensity, 0, 100);
+
 		ImGui::End();
 	}
 
 	// Draw light visualisation
 	aie::Gizmos::addSphere(m_position, m_radius, 16, 8, glm::vec4(m_colour, 1));
-
-	if (m_debug)
-	{
-		// Draw InteractiveMenu range 
-		aie::Gizmos::addSphere(m_position, m_radius, 16, 8, glm::vec4(0, 0, 0, 0));
-	}
 }
 

@@ -50,7 +50,7 @@ private:
 	float m_turnSpeed = 0.1f;
 	float m_moveSpeed = 7.5f;
 
-	float m_scrollSpeed = 1;
+	float m_scrollSpeed = 5.0F;
 	float m_scrollWheelMove = 0;
 
 	bool m_invertVertical = false;

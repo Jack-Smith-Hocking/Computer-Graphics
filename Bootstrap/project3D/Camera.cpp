@@ -26,9 +26,8 @@ void Camera::Update(float deltaTime)
 	glm::vec3 right(-sin(thetaR), 0, cos(thetaR));
 	glm::vec3 up(0, 1, 0);
 
-	forward *= deltaTime;
-	right *= deltaTime;
-	up *= deltaTime;
+	float moveSpeed = m_moveSpeed * deltaTime;
+	float scrollSpeed = m_scrollSpeed * deltaTime;
 
 	float scrollThisFrame = m_input->getMouseScroll() - m_scrollWheelMove;
 	m_scrollWheelMove = m_input->getMouseScroll();
@@ -36,27 +35,27 @@ void Camera::Update(float deltaTime)
 	// Use WASD, ZX keys to move camera around
 	if (m_input->isKeyDown(aie::INPUT_KEY_X))
 	{
-		m_position += up * m_moveSpeed;
+		m_position += up * moveSpeed;
 	}
 	if (m_input->isKeyDown(aie::INPUT_KEY_Z))
 	{
-		m_position -= up * m_moveSpeed;
+		m_position -= up * moveSpeed;
 	}
 	if (m_input->isKeyDown(aie::INPUT_KEY_W) || scrollThisFrame > 0)
 	{
-		m_position += forward * (scrollThisFrame > 0 ? m_scrollSpeed / deltaTime : m_moveSpeed);
+		m_position += forward * (scrollThisFrame > 0 ? scrollSpeed : moveSpeed);
 	}
 	if (m_input->isKeyDown(aie::INPUT_KEY_S) || scrollThisFrame < 0)
 	{
-		m_position -= forward * (scrollThisFrame < 0 ? m_scrollSpeed / deltaTime : m_moveSpeed);
+		m_position -= forward * (scrollThisFrame < 0 ? scrollSpeed : moveSpeed);
 	}
 	if (m_input->isKeyDown(aie::INPUT_KEY_D))
 	{
-		m_position += right * m_moveSpeed;
+		m_position += right * moveSpeed;
 	}
 	if (m_input->isKeyDown(aie::INPUT_KEY_A))
 	{
-		m_position -= right * m_moveSpeed;
+		m_position -= right * moveSpeed;
 	}
 
 	// Get current mouse coordinates 
@@ -151,7 +150,7 @@ void Camera::DrawMenu()
 
 	ImGui::SliderFloat("Turn Speed", &m_turnSpeed, 0.0f, 0.5f);
 	ImGui::SliderFloat("Move Speed", &m_moveSpeed, 0.0f, 20.0f);
-	ImGui::SliderFloat("Scroll Speed", &m_scrollSpeed, 0.0f, 20.0f);
+	ImGui::SliderFloat("Scroll Speed", &m_scrollSpeed, 0.0f, 50.0f);
 	ImGui::End();
 }
 

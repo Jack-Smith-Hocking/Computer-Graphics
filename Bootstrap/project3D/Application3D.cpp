@@ -191,8 +191,23 @@ void Application3D::draw() {
 		m_phongTextured.bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_spearTransform)));
 		// Bind light
 		m_phongTextured.bindUniform("Ia", m_ambientLight);
-		m_phongTextured.bindUniform("LightColour", m_light->m_colour);
-		m_phongTextured.bindUniform("LightPosition", m_light->m_position);
+
+		glm::vec3 pos[2];
+		glm::vec3 col[2];
+		float in[2];
+
+		pos[0] = m_light->m_position;
+		pos[1] = m_light2->m_position;
+
+		col[0] = m_light->m_colour;
+		col[1] = m_light2->m_colour;
+
+		in[0] = m_light->m_intensity;
+		in[1] = m_light2->m_intensity;
+
+		m_phongTextured.bindUniform("LightColour", 2, &col[0]);
+		m_phongTextured.bindUniform("LightPosition", 2, &pos[0]);
+		m_phongTextured.bindUniform("LightIntensity", 2, &in[0]);
 		// Bind camera position
 		m_phongTextured.bindUniform("CameraPosition", vec3(glm::inverse(m_viewMatrix)[3]));
 
