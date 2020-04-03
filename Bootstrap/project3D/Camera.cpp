@@ -4,6 +4,7 @@
 #include "Application3D.h"
 #include "Scene.h"
 #include "Gizmos.h"
+#include "ImGuiFunctions.h"
 
 #include "Light.h"
 #include "Model.h"
@@ -109,46 +110,31 @@ void Camera::DrawMenu()
 	ImGui::Checkbox("Show Debug", &m_debugInfo.showDebug);
 	if (m_debugInfo.showDebug)
 	{
-		ImGui::Indent();
+		ImGuiFunctions::OpenSection(0, 0, true, false);
 
 		ImGui::Checkbox("Show Wire Cage", &m_debugInfo.showSphere);
 
 		ImGui::SliderFloat3("Line Colour", &m_debugInfo.lineColour[0], 0, 1);
 
-		ImGui::Spacing();
-		ImGui::Spacing();
-
-		ImGui::Unindent();
-		ImGui::Separator();
-
-		ImGui::Spacing();
-		ImGui::Spacing();
+		ImGuiFunctions::CloseSection(2, 2, true, true);
 	}
 
 	ImGui::Checkbox("Show Crosshair", &m_crosshairInfo.showCrosshair);
 	if (m_crosshairInfo.showCrosshair)
 	{
-		ImGui::Indent();
+		ImGuiFunctions::OpenSection(0, 0, true, false);
 
 		ImGui::SliderFloat("Size", &m_crosshairInfo.size, 0, 20);
 
 		ImGui::SliderFloat3("Crosshair Colour", &m_crosshairInfo.colour[0], 0, 1);
 
-		ImGui::Spacing();
-		ImGui::Spacing();
-
-		ImGui::Unindent();
-		ImGui::Separator();
-
-		ImGui::Spacing();
-		ImGui::Spacing();
+		ImGuiFunctions::CloseSection(2, 2, true, true);
 	}
 
 	ImGui::Checkbox("Invert Vertical", &m_invertVertical);
 	ImGui::Checkbox("Invert Horizontal", &m_invertHorizontal);
 
-	ImGui::Spacing();
-	ImGui::Spacing();
+	ImGuiFunctions::AddSpacings(2);
 
 	ImGui::SliderFloat("Turn Speed", &m_turnSpeed, 0.0f, 0.5f);
 	ImGui::SliderFloat("Move Speed", &m_moveSpeed, 0.0f, 20.0f);

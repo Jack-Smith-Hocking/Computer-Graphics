@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "imgui.h"
 #include "Gizmos.h"
+#include "ImGuiFunctions.h"
 
 extern int g_gridSize;
 
@@ -24,99 +25,57 @@ void Model::Update(float deltaTime)
 
 	if (m_showMenu)
 	{
-		ImVec2 resetSize = ImVec2(50, 30);
+		ImVec2 resetSize = ImVec2(100, 30);
 
 		ImGui::Begin("Model Settings");
 
 		ImGui::Checkbox("Hide Model", &m_hide);
 
+		ImGuiFunctions::OpenSection(1, 1, true, true);
+
 		// Collider
 		{
 			ImGui::Text("Collider");
-			ImGui::Indent();
+
+			ImGuiFunctions::OpenSection(0, 0, true, false);
 
 			ImGui::SliderFloat("Collision Radius", &m_radius, 0.1f, 10);
-			ImGui::SameLine();
-			if (ImGui::Button("Reset", resetSize))
-			{
-				m_radius = 2;
-			}
-			ImGui::NewLine();
+			ImGuiFunctions::ResetButton("Reset Radius", m_radius, 1, resetSize);
 
 			ImGui::SliderFloat3("Offset", &m_offset[0], -10, 10);
-			ImGui::SameLine();
-			if (ImGui::Button("Reset", resetSize))
-			{
-				m_offset = glm::vec3(0, 0, 0);
-			}
-			ImGui::NewLine();
+			ImGuiFunctions::ResetButton("Reset Offset", m_offset, glm::vec3(0, 0, 0), resetSize);
 
-			ImGui::Unindent();
-
-			ImGui::Spacing();
-			ImGui::Spacing();
-
-			ImGui::Separator();
-
-			ImGui::Spacing();
-			ImGui::Spacing();
+			ImGuiFunctions::CloseSection(0, 2, true, true);
 		}
 
 		// Scale
 		{
 			ImGui::Checkbox("Use Uniform Scaling", &m_useUniformScale);
-			ImGui::Indent();
 
+			ImGuiFunctions::OpenSection(0, 0, true, false);
 			if (m_useUniformScale)
 			{
 				ImGui::SliderFloat("Uniform Scale", &m_uniformScale, 0, 10);
-
-				ImGui::SameLine();
-				if (ImGui::Button("Reset", resetSize))
-				{
-					m_uniformScale = 1;
-				}
-				ImGui::NewLine();
+				ImGuiFunctions::ResetButton("Reset UScale", m_uniformScale, 1, resetSize);
 
 				m_scale = glm::vec3(m_uniformScale, m_uniformScale, m_uniformScale);
 			}
 			else
 			{
 				ImGui::SliderFloat3("Scale", &m_scale[0], 0, 10);
-				ImGui::SameLine();
-				if (ImGui::Button("Reset", resetSize))
-				{
-					m_scale = glm::vec3(1, 1, 1);
-				}
-				ImGui::NewLine();
+				ImGuiFunctions::ResetButton("Reset Scale", m_scale, glm::vec3(0, 0, 0), resetSize);
 			}
 
-			ImGui::Unindent();
-
-			ImGui::Spacing();
-			ImGui::Spacing();
-
-			ImGui::Separator();
-
-			ImGui::Spacing();
-			ImGui::Spacing();
+			ImGuiFunctions::CloseSection(0, 2, true, true);
 		}
 
 		ImGui::SliderFloat3("Rotation", &m_euler[0], 0, 360);
-		ImGui::SameLine();
-		if (ImGui::Button("Reset", resetSize))
-		{
-			m_euler = glm::vec3(0, 0, 0);
-		}
-		ImGui::NewLine();
+		ImGuiFunctions::ResetButton("Reset Rotation", m_euler, glm::vec3(0, 0, 0), resetSize);
 
 		ImGui::SliderFloat3("Position", &m_position[0], -g_gridSize, g_gridSize);
-		ImGui::SameLine();
-		if (ImGui::Button("Reset", resetSize))
-		{
-			m_position = glm::vec3(0, 0, 0);
-		}
-		ImGui::NewLine();
+		ImGuiFunctions::ResetButton("Reset Position", m_position, glm::vec3(0, 0, 0), resetSize);
+
+		ImGuiFunctions::CloseSection(1, 1, true, true);
 
 		ImGui::End();
 	}

@@ -2,6 +2,7 @@
 #include "Gizmos.h"
 #include "imgui.h"
 #include "Object.h"
+#include "ImGuiFunctions.h"
 
 extern int g_gridSize;
 
@@ -19,13 +20,11 @@ void Light::Update(float deltaTime)
 		ImGui::Checkbox("Enabled", &m_enabled);
 		ImGui::Checkbox("Hide Light", &m_hide);
 
-		ImGui::Separator();
+		ImGuiFunctions::OpenSection(1, 1, true, true);
 
 		ImGui::SliderFloat3("Position", &m_position[0], -g_gridSize, g_gridSize);
 		ImGui::SliderFloat3("Colour", &m_colour[0], 0, 1);
 
-		ImGui::Spacing();
-		ImGui::Spacing();
 
 		ImGui::SliderFloat("Intensity", &m_intensity, 0, 100);
 
@@ -33,6 +32,8 @@ void Light::Update(float deltaTime)
 		{
 			m_attemptDelete = true;
 		}
+
+		ImGuiFunctions::CloseSection(1, 1, true, true);
 
 		ImGui::End();
 	}

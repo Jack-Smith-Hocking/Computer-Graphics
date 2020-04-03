@@ -51,6 +51,9 @@
     <ClCompile Include="Interactable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ImGuiFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application3D.h">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Interactable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

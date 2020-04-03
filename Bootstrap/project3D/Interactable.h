@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.h"
+#include <string>
 
 class Interactable : public Object
 {
@@ -20,6 +21,9 @@ public:
 	glm::vec3 GetOffsetPosition() { return m_position + m_offset; };
 
 protected:
+
+	static void ImGuiResetFormatting(bool open);
+
 	float m_radius = 2;
 	
 	glm::vec3 m_offset = glm::vec3(0, 0, 0);
