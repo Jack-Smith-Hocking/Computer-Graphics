@@ -7,11 +7,14 @@
 #include "Gizmos.h"
 #include "imgui.h"
 #include "Camera.h"
+#include "ImGuiFunctions.h"
 #include <algorithm>
 #include <vector>
 
 extern unsigned int g_windowWidth;
 extern unsigned int g_windowHeight;
+
+extern glm::vec4 g_selectedColour;
 
 extern int g_gridSize;
 
@@ -77,21 +80,19 @@ void Scene::UpdateImGui()
 
 	if (m_gridInfo.drawGrid)
 	{
-		ImGui::Indent();
+		ImGuiFunctions::OpenSection(0, 0, true, false);
 
 		ImGui::SliderFloat3("Grid Colour", &m_gridInfo.colour[0], 0, 1);
+		ImGuiFunctions::ResetButton<glm::vec3>("Reset Grid Colour", m_gridInfo.colour, glm::vec3(0, 0, 0), ImVec2(125, 20));
 
 		ImGui::SliderInt("Grid Size", &g_gridSize, 10, 250);
+		ImGuiFunctions::ResetButton<int>("Reset Grid Size", g_gridSize, 10, ImVec2(125, 20));
 
-		ImGui::Spacing();
-		ImGui::Spacing();
-
-		ImGui::Unindent();
-		ImGui::Separator();
-
-		ImGui::Spacing();
-		ImGui::Spacing();
+		ImGuiFunctions::CloseSection(2, 2, true, true);
 	}
+
+	ImGui::SliderFloat4("Selected Colour", &g_selectedColour[0], 0, 1);
+	ImGuiFunctions::ResetButton<glm::vec4>("Reset Selected Colour", g_selectedColour, glm::vec4(1, 0, 0, 0.3f), ImVec2(150, 20));
 
 	if (ImGui::Button("Add Light", ImVec2(100, 40)))
 	{

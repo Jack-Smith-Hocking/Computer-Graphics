@@ -25,7 +25,7 @@ void Model::Update(float deltaTime)
 
 	if (m_showMenu)
 	{
-		ImVec2 resetSize = ImVec2(100, 30);
+		ImVec2 resetSize = ImVec2(100, 20);
 
 		ImGui::Begin("Model Settings");
 
@@ -40,7 +40,7 @@ void Model::Update(float deltaTime)
 			ImGuiFunctions::OpenSection(0, 0, true, false);
 
 			ImGui::SliderFloat("Collision Radius", &m_radius, 0.1f, 10);
-			ImGuiFunctions::ResetButton("Reset Radius", m_radius, 1, resetSize);
+			ImGuiFunctions::ResetButton<float>("Reset Radius", m_radius, 1, resetSize);
 
 			ImGui::SliderFloat3("Offset", &m_offset[0], -10, 10);
 			ImGuiFunctions::ResetButton("Reset Offset", m_offset, glm::vec3(0, 0, 0), resetSize);
@@ -56,14 +56,14 @@ void Model::Update(float deltaTime)
 			if (m_useUniformScale)
 			{
 				ImGui::SliderFloat("Uniform Scale", &m_uniformScale, 0, 10);
-				ImGuiFunctions::ResetButton("Reset UScale", m_uniformScale, 1, resetSize);
+				ImGuiFunctions::ResetButton<float>("Reset UScale", m_uniformScale, 1, resetSize);
 
 				m_scale = glm::vec3(m_uniformScale, m_uniformScale, m_uniformScale);
 			}
 			else
 			{
 				ImGui::SliderFloat3("Scale", &m_scale[0], 0, 10);
-				ImGuiFunctions::ResetButton("Reset Scale", m_scale, glm::vec3(0, 0, 0), resetSize);
+				ImGuiFunctions::ResetButton<glm::vec3>("Reset Scale", m_scale, glm::vec3(0, 0, 0), resetSize);
 			}
 
 			ImGuiFunctions::CloseSection(0, 2, true, true);

@@ -6,9 +6,8 @@
 static class ImGuiFunctions
 {
 public:
-	static void ResetButton(std::string title, glm::vec3& vec3, glm::vec3 vec3Default, ImVec2 size, bool sameLine = true);
-	static void ResetButton(std::string title, glm::vec4& vec4, glm::vec4 vec4Default, ImVec2 size, bool sameLine = true);
-	static void ResetButton(std::string title, float& f, float floatDefault, ImVec2 size, bool sameLine = true);
+	template <typename T>
+	static void ResetButton(std::string title, T& value, T valueDefault, ImVec2 size, bool sameLine = true);
 
 	static void OpenSection(int spacingBeforeIndent, int spacingAfterIndent, bool indent = true, bool useSeperator = true);
 	static void CloseSection(int spacingBeforeUnindent, int spacingAfterUnindent, bool unindent = true, bool useSeperator = true);
@@ -16,3 +15,18 @@ public:
 	static void AddSpacings(int spacingCount);
 };
 
+template<typename T>
+inline void ImGuiFunctions::ResetButton(std::string title, T& value, T valueDefault, ImVec2 size, bool sameLine)
+{
+	if (sameLine)
+	{
+		ImGui::SameLine();
+	}
+
+	if (ImGui::Button(title.c_str(), size))
+	{
+		value = valueDefault;
+	}
+
+	ImGui::NewLine();
+}
