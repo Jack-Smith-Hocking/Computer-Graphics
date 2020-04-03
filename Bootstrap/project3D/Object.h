@@ -23,6 +23,7 @@ public:
 	bool m_attemptDelete = false;
 
 protected:
+	bool m_hide = false;
 
 	glm::mat4 m_transform;
 };

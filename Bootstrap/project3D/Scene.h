@@ -5,7 +5,7 @@
 class Light;
 class Model;
 class Camera;
-class Interactive;
+class Interactable;
 class Object;
 
 class Scene
@@ -24,13 +24,13 @@ public:
 	void AddLight(Light* light);
 	void AddModel(Model* model);
 
-	void AttemptToDelete(std::vector<Interactive*>& objList, Object* obj);
-	void SafelyCheckToDelete(std::vector<Interactive*>& objs);
+	void AttemptToDelete(std::vector<Interactable*>& objList, Object* obj);
+	void SafelyCheckToDelete(std::vector<Interactable*>& objs);
 
 	void UseShader(aie::ShaderProgram* shader);
 
-	std::vector<Interactive*> m_models;
-	std::vector<Interactive*> m_lights;
+	std::vector<Interactable*> m_models;
+	std::vector<Interactable*> m_lights;
 
 	glm::mat4 GetProjectionMatrix();
 	glm::mat4 GetViewMatrix();

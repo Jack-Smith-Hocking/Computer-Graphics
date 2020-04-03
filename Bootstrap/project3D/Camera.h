@@ -2,7 +2,7 @@
 #include <glm\ext.hpp>
 #include "Input.h"
 
-class Interactive;
+class Interactable;
 class Scene;
 
 class Camera
@@ -36,7 +36,7 @@ public:
 
 	glm::vec3 GetForward();
 	void SelectTarget();
-	Interactive* EvaluateTargets(const std::vector<Interactive*>& interactables, const glm::vec3& dir, float& closestDist);
+	Interactable* EvaluateTargets(const std::vector<Interactable*>& interactables, const glm::vec3& dir, float& closestDist);
 
 	void SetScene(Scene* scene);
 
@@ -67,6 +67,6 @@ private:
 	CrosshairInformation m_crosshairInfo;
 
 	Scene* m_scene = nullptr;
-	Interactive* m_currentMenu = nullptr;
+	Interactable* m_currentMenu = nullptr;
 };
 

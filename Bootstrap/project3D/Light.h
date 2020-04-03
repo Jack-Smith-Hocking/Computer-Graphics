@@ -1,8 +1,8 @@
 #pragma once
 #include <glm\ext.hpp>
-#include "Interactive.h"
+#include "Interactable.h"
 
-class Light : public Interactive
+class Light : public Interactable
 {
 public:
 	Light(glm::vec3 position, glm::vec3 colour);
@@ -12,7 +12,7 @@ public:
 
 	glm::vec3 m_colour;
 
-	bool m_enabled;
+	bool m_enabled = true;
 
 	float m_intensity = 1;
 };

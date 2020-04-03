@@ -172,7 +172,7 @@
   <ItemGroup>
     <ClCompile Include="Application3D.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Interactive.cpp" />
+    <ClCompile Include="Interactable.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -185,7 +185,7 @@
   <ItemGroup>
     <ClInclude Include="Application3D.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Interactive.h" />
+    <ClInclude Include="Interactable.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />

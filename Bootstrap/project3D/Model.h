@@ -1,12 +1,12 @@
 #pragma once
-#include "Interactive.h"
+#include "Interactable.h"
 
 #include <string>
 #include "OBJMesh.h"
 #include "Shader.h"
 #include "glm/ext.hpp"
 
-class Model : public Interactive
+class Model : public Interactable
 {
 public:
 

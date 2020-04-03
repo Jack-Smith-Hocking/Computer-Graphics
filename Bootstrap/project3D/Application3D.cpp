@@ -14,6 +14,8 @@ using aie::Gizmos;
 unsigned int g_windowHeight;
 unsigned int g_windowWidth;
 
+glm::vec4 g_selectedColour = glm::vec4(1, 0, 0, 0.2f);
+
 int g_gridSize;
 
 Application3D::Application3D() {
@@ -63,16 +65,23 @@ bool Application3D::startup() {
 	//};
 
 	m_light = new Light(glm::vec3(-10, 0, 0), glm::vec3(0, 1, 0));
+	m_light->m_intensity = 20;
+
 	m_light2 = new Light(glm::vec3(10, 0, 0), glm::vec3(1, 0, 0));
+	m_light2->m_intensity = 20;
+
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
-	m_camera = new Camera();
-
-	m_scene = new Scene(m_camera);
+	m_scene = new Scene(new Camera());
 	m_scene->AddLight(m_light);
 	m_scene->AddLight(m_light2);
 
 	m_spear = new Model(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), m_phongTextured);
+	m_spear->Load("./models/soulspear/soulspear.obj");
+
+	m_scene->AddModel(m_spear);
+
+	m_spear = new Model(glm::vec3(5, 0, 5), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), m_phongTextured);
 	m_spear->Load("./models/soulspear/soulspear.obj");
 
 	m_scene->AddModel(m_spear);

@@ -5,7 +5,7 @@
 
 extern int g_gridSize;
 
-Model::Model(glm::vec3 pos, glm::vec3 euler, glm::vec3 scale, aie::ShaderProgram* shader) : Interactive(pos, euler, scale), m_shader(shader)
+Model::Model(glm::vec3 pos, glm::vec3 euler, glm::vec3 scale, aie::ShaderProgram* shader) : Interactable(pos, euler, scale), m_shader(shader)
 {
 
 }
@@ -27,6 +27,8 @@ void Model::Update(float deltaTime)
 		ImVec2 resetSize = ImVec2(50, 30);
 
 		ImGui::Begin("Model Settings");
+
+		ImGui::Checkbox("Hide Model", &m_hide);
 
 		// Collider
 		{
@@ -119,14 +121,13 @@ void Model::Update(float deltaTime)
 		ImGui::End();
 	}
 
-	if (m_showCollider)
-	{
-		aie::Gizmos::addSphere(m_position + m_offset, m_radius, 16, 8, glm::vec4(1, 1, 1, 0));
-	}
+	Interactable::Update(deltaTime);
 }
 
 void Model::Draw(Scene* scene)
 {
+	if (m_hide) return;
+	
 	if (scene != nullptr)
 	{
 		scene->UseShader(m_shader);
@@ -136,6 +137,7 @@ void Model::Draw(Scene* scene)
 
 	m_shader->bindUniform("ProjectionViewModel", pvm);
 	m_shader->bindUniform("NormalMatrix", glm::inverseTranspose(glm::mat3(m_transform)));
+	m_shader->bindUniform("ModelMatrix", m_transform);
 
 	if (m_mesh != nullptr)
 	{

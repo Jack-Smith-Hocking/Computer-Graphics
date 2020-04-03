@@ -1,6 +1,6 @@
 #include "Scene.h"
 
-#include "Interactive.h"
+#include "Interactable.h"
 #include "Light.h"
 #include "Model.h"
 
@@ -38,7 +38,7 @@ void Scene::Update(float deltaTime)
 		light->Update(deltaTime);
 		light->ToggleCollider(m_debugInfo.showColliders);
 	}
-	for each (Interactive * model in m_models)
+	for each (Interactable * model in m_models)
 	{
 		model->Update(deltaTime);
 		model->ToggleCollider(m_debugInfo.showColliders);
@@ -49,7 +49,7 @@ void Scene::Draw()
 {
 	DrawGrid(g_gridSize, m_gridInfo.drawGrid);
 
-	for each (Interactive* model in m_models)
+	for each (Interactable* model in m_models)
 	{
 		model->Draw(this);
 	}
@@ -144,7 +144,7 @@ void Scene::AddModel(Model* model)
 	}
 }
 
-void Scene::AttemptToDelete(std::vector<Interactive*>& objList, Object* obj)
+void Scene::AttemptToDelete(std::vector<Interactable*>& objList, Object* obj)
 {
 	if (obj != nullptr)
 	{
@@ -152,7 +152,7 @@ void Scene::AttemptToDelete(std::vector<Interactive*>& objList, Object* obj)
 	}
 }
 
-void Scene::SafelyCheckToDelete(std::vector<Interactive*>& objs)
+void Scene::SafelyCheckToDelete(std::vector<Interactable*>& objs)
 {
 	std::vector <Object* > objsToDelete;
 

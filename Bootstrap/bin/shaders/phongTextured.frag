@@ -66,9 +66,9 @@ void main()
 		lightDirection =  normalize(toLight);
 
 		distanceSqrd = dot(toLight, toLight);
-		attenuation = 1.0; // distanceSqrd;
+		attenuation = 1.0 / distanceSqrd;
 
-		intensity = (LightColour[i] * (LightIntensity[i] * LightIntensity[i])) * attenuation;
+		intensity = (LightColour[i] * LightIntensity[i]) * attenuation;
 
 		lambertTerm += DiffuseLight(N, lightDirection, intensity);
 		specularTerm += SpecularLight(N, lightDirection, intensity); 
@@ -79,7 +79,6 @@ void main()
 
 	// Calculate each colour property
 	vec3 ambient = Ia * Ka;
-
 
 	// output lambert as grayscale
 	FragColour = vec4( ambient + diffuse + specular, 1 ) + texture( diffuseTexture, vTexCoord );

@@ -1,6 +1,6 @@
 #include "Camera.h"
 #include "imgui.h"
-#include "Interactive.h"
+#include "Interactable.h"
 #include "Application3D.h"
 #include "Scene.h"
 #include "Gizmos.h"
@@ -170,18 +170,23 @@ void Camera::SelectTarget()
 {
 	if (m_scene != nullptr)
 	{
+		if (m_currentMenu != nullptr)
+		{
+			m_currentMenu->OffClick();
+		}
+
 		glm::vec3 dir = GetForward();
 		
 		m_debugInfo.forward = dir;
 		m_debugInfo.position = m_position;
 
-		Interactive* closestInteractive = nullptr;
+		Interactable* closestInteractive = nullptr;
 
 		// The closes viable light from m_position
 		float closestDist = 1000000000;
 
 		closestInteractive = EvaluateTargets(m_scene->m_lights, dir, closestDist);
-		Interactive* temp = EvaluateTargets(m_scene->m_models, dir, closestDist);
+		Interactable* temp = EvaluateTargets(m_scene->m_models, dir, closestDist);
 
 		if (temp != nullptr)
 		{
@@ -190,11 +195,6 @@ void Camera::SelectTarget()
 
 		if (closestInteractive != nullptr)
 		{
-			if (m_currentMenu != nullptr)
-			{
-				m_currentMenu->OffClick();
-			}
-
 			m_currentMenu = closestInteractive;
 			m_currentMenu->OnClick();
 		}
@@ -205,7 +205,7 @@ void Camera::SelectTarget()
 	}
 }
 
-Interactive* Camera::EvaluateTargets(const std::vector<Interactive*>& interactables, const glm::vec3& dir, float& closestDist)
+Interactable* Camera::EvaluateTargets(const std::vector<Interactable*>& interactables, const glm::vec3& dir, float& closestDist)
 {
 	// Vector between the ray origin and the centre of the collision sphere
 	glm::vec3 L;
@@ -218,7 +218,7 @@ Interactive* Camera::EvaluateTargets(const std::vector<Interactive*>& interactab
 	// Start point of the ray
 	glm::vec3 origin = m_position;
 
-	for each (Interactive* interactable in interactables)
+	for each (Interactable* interactable in interactables)
 	{
 		L = interactable->GetOffsetPosition() - m_position;
 		closestDistToCentre = glm::dot(L, dir);
