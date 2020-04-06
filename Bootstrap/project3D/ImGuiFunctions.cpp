@@ -35,3 +35,20 @@ void ImGuiFunctions::AddSpacings(int spacingCount)
 		ImGui::Spacing();
 	}
 }
+
+void ImGuiFunctions::DisplayError(std::string errorInfo, ImVec4 errorColour, bool showError)
+{
+	if (!showError) return;
+
+	ImGui::Begin("Issues Detected");
+
+	ImGui::TextColored(errorColour, errorInfo.c_str());
+
+	ImGui::End();
+
+	/*ImGui::BeginMainMenuBar();
+
+	ImGui::TextColored(errorColour, errorInfo.c_str());
+
+	ImGui::EndMainMenuBar();*/
+}

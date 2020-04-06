@@ -16,13 +16,14 @@ public:
 
 	void UpdateTransform();
 
+	bool AttemptDelete() { return m_attemptDelete; };
+
 	glm::vec3 m_position;
 	glm::vec3 m_euler;
 	glm::vec3 m_scale;
 
-	bool m_attemptDelete = false;
-
 protected:
+	bool m_attemptDelete = false;
 	bool m_hide = false;
 
 	glm::mat4 m_transform;

@@ -1,6 +1,8 @@
 #pragma once
-#include <vector>
 #include "Shader.h"
+#include "imgui.h"
+#include <vector>
+#include <string>
 
 class Light;
 class Model;
@@ -12,12 +14,13 @@ class Scene
 {
 public:
 
-	Scene(Camera* camera);
+	Scene(Camera* camera, aie::ShaderProgram* defaultShader);
 
 	void Update(float deltaTime);
 	void Draw();
 
 	void UpdateImGui();
+	void LoadModelMenu();
 
 	void DrawGrid(int gridSize, bool doGrid);
 
@@ -27,7 +30,11 @@ public:
 	void AttemptToDelete(std::vector<Interactable*>& objList, Object* obj);
 	void SafelyCheckToDelete(std::vector<Interactable*>& objs);
 
-	void UseShader(aie::ShaderProgram* shader);
+	void BindShaderUniforms(aie::ShaderProgram* shader);
+
+	bool LoadModel(std::string fileDir, std::string& errorMsg);
+
+	void EvaluateLights();
 
 	std::vector<Interactable*> m_models;
 	std::vector<Interactable*> m_lights;
@@ -35,9 +42,8 @@ public:
 	glm::mat4 GetProjectionMatrix();
 	glm::mat4 GetViewMatrix();
 
-	glm::vec3 m_ambientLight = glm::vec3(0.25f, 0.25f, 0.25f);
-
 private:
+
 	struct GridInformation
 	{
 		bool drawGrid = true;
@@ -47,14 +53,19 @@ private:
 	struct DebugInformation
 	{
 		bool showColliders = true;
+		bool hideErrorPanel = false;
 	};
 
 	GridInformation m_gridInfo;
 	DebugInformation m_debugInfo;
 
 	Camera* m_mainCamera = nullptr;
+	aie::ShaderProgram* m_defaultShader = nullptr;
 	std::vector<Light*> m_availableLights; 
 
+	std::string m_currentModelError = "";
+
 	bool m_maxLightsReached = false;
+	bool m_loadModelMenuOpen = false;
 };
 

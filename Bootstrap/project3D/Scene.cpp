@@ -5,7 +5,6 @@
 #include "Model.h"
 
 #include "Gizmos.h"
-#include "imgui.h"
 #include "Camera.h"
 #include "ImGuiFunctions.h"
 #include <algorithm>
@@ -18,7 +17,11 @@ extern glm::vec4 g_selectedColour;
 
 extern int g_gridSize;
 
-Scene::Scene(Camera* camera) : m_mainCamera(camera)
+extern std::string g_soulSpearDir;
+extern std::string g_bunnyDir;
+extern std::string g_dragonDir;
+
+Scene::Scene(Camera* camera, aie::ShaderProgram* defaultShader) : m_mainCamera(camera), m_defaultShader(defaultShader)
 {
 	if (camera == nullptr)
 	{
@@ -46,6 +49,11 @@ void Scene::Update(float deltaTime)
 		model->Update(deltaTime);
 		model->ToggleCollider(m_debugInfo.showColliders);
 	}
+
+	if (m_models.size() == 0)
+	{
+		EvaluateLights();
+	}
 }
 
 void Scene::Draw()
@@ -65,16 +73,26 @@ void Scene::UpdateImGui()
 	SafelyCheckToDelete(m_lights);
 	SafelyCheckToDelete(m_models);
 
-	if (m_maxLightsReached)
+	if (!m_debugInfo.hideErrorPanel)
 	{
-		ImGui::BeginMainMenuBar();
-		
-		ImGui::TextColored(ImVec4(1, 1, 0, 1), "Warning! Max number of lights enabled!");
-
-		ImGui::EndMainMenuBar();
+		ImGuiFunctions::DisplayError("Warning! Max number of lights enabled! All new lights will be disabled!", ImVec4(1, 1, 0, 1), m_maxLightsReached);
+		ImGuiFunctions::DisplayError(m_currentModelError, ImVec4(1, 0, 0, 1), true);
 	}
 
 	ImGui::Begin("Scene Settings");
+
+	ImGui::Text("Issues Panel");
+	ImGuiFunctions::OpenSection(1, 1, true, true);
+
+	ImGui::Checkbox("Hide Issues Panel", &m_debugInfo.hideErrorPanel);
+	
+	if (ImGui::Button("Clear Issues", ImVec2(100, 20)))
+	{
+		m_currentModelError.clear();
+	}
+
+	ImGuiFunctions::CloseSection(1, 1, true, true);
+
 	ImGui::Checkbox("Show Colliders", &m_debugInfo.showColliders);
 	ImGui::Checkbox("Show Grid", &m_gridInfo.drawGrid);
 
@@ -83,24 +101,62 @@ void Scene::UpdateImGui()
 		ImGuiFunctions::OpenSection(0, 0, true, false);
 
 		ImGui::SliderFloat3("Grid Colour", &m_gridInfo.colour[0], 0, 1);
-		ImGuiFunctions::ResetButton<glm::vec3>("Reset Grid Colour", m_gridInfo.colour, glm::vec3(0, 0, 0), ImVec2(125, 20));
+		ImGuiFunctions::ButtonSet<glm::vec3>("Reset Grid Colour", m_gridInfo.colour, glm::vec3(0, 0, 0), ImVec2(125, 20));
 
 		ImGui::SliderInt("Grid Size", &g_gridSize, 10, 250);
-		ImGuiFunctions::ResetButton<int>("Reset Grid Size", g_gridSize, 10, ImVec2(125, 20));
+		ImGuiFunctions::ButtonSet<int>("Reset Grid Size", g_gridSize, 10, ImVec2(125, 20));
 
 		ImGuiFunctions::CloseSection(2, 2, true, true);
 	}
 
 	ImGui::SliderFloat4("Selected Colour", &g_selectedColour[0], 0, 1);
-	ImGuiFunctions::ResetButton<glm::vec4>("Reset Selected Colour", g_selectedColour, glm::vec4(1, 0, 0, 0.3f), ImVec2(150, 20));
+	ImGuiFunctions::ButtonSet<glm::vec4>("Reset Selected Colour", g_selectedColour, glm::vec4(1, 0, 0, 0.3f), ImVec2(150, 20));
 
-	if (ImGui::Button("Add Light", ImVec2(100, 40)))
+	if (ImGui::Button("Add Light", ImVec2(100, 20)))
 	{
 		Light* newLight = new Light(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0));
 		newLight->m_enabled = false;
 
 		AddLight(newLight);
 	}
+
+	ImGuiFunctions::ButtonSet<bool>("Load Model", m_loadModelMenuOpen, true, ImVec2(100, 20));
+
+	ImGui::End();
+
+	if (m_loadModelMenuOpen)
+	{
+		LoadModelMenu();
+	}
+}
+
+void Scene::LoadModelMenu()
+{
+	ImGui::Begin("Load Model");
+
+	ImGui::Text("Models");
+	ImGuiFunctions::OpenSection(1, 1, true, true);
+
+	static std::string errorMsg;
+
+	if (ImGui::Button("Load Spear", ImVec2(75, 30)))
+	{
+		LoadModel(g_soulSpearDir, errorMsg);
+	}
+
+	if (ImGui::Button("Load Bunny", ImVec2(75, 30)))
+	{
+		LoadModel(g_bunnyDir, errorMsg);
+	}
+
+	if (ImGui::Button("Load Dragon", ImVec2(75, 30)))
+	{
+		LoadModel(g_dragonDir, errorMsg);
+	}
+
+	ImGuiFunctions::CloseSection(1, 1, true, true);
+
+	ImGuiFunctions::ButtonSet<bool>("Quit", m_loadModelMenuOpen, false, ImVec2(75, 30), false);
 
 	ImGui::End();
 }
@@ -160,7 +216,7 @@ void Scene::SafelyCheckToDelete(std::vector<Interactable*>& objs)
 	// Iterate through list to check if any are marked for deleting
 	for each (Object* obj in objs)
 	{
-		if (obj->m_attemptDelete)
+		if (obj->AttemptDelete())
 		{
 			objsToDelete.push_back(obj);
 		}
@@ -177,7 +233,7 @@ void Scene::SafelyCheckToDelete(std::vector<Interactable*>& objs)
 	}
 }
 
-void Scene::UseShader(aie::ShaderProgram* shader)
+void Scene::BindShaderUniforms(aie::ShaderProgram* shader)
 {
 	// Check if a valid shader was given
 	if (shader == nullptr)
@@ -186,30 +242,7 @@ void Scene::UseShader(aie::ShaderProgram* shader)
 		return;
 	}
 
-	// Check which lights will be available, max lights will be 8 based off of which ones are enabled
-	if (m_availableLights.size() == 0)
-	{
-		Light* light = nullptr;
-
-		for (int i = 0; i < m_lights.size(); i++)
-		{
-			light = dynamic_cast<Light*>(m_lights[i]);
-
-			if (light != nullptr)
-			{
-				if (light->m_enabled && m_availableLights.size() < 8)
-				{
-					m_availableLights.push_back(light);
-					m_maxLightsReached = false;
-				}
-				else if (m_availableLights.size() >= 8)
-				{
-					light->m_enabled = false;
-					m_maxLightsReached = true;
-				}
-			}
-		}
-	}
+	EvaluateLights();
 
 	// Create simple passable arrays
 	glm::vec3 pos[8];
@@ -243,8 +276,70 @@ void Scene::UseShader(aie::ShaderProgram* shader)
 	shader->bindUniform("LightIntensity", 8, in);
 
 	shader->bindUniform("CameraPosition", glm::vec3(glm::inverse(m_mainCamera->GetViewMatrix())[3]));
+}
 
-	shader->bindUniform("Ia", m_ambientLight);
+bool Scene::LoadModel(std::string fileDir, std::string& errorMsg)
+{
+	bool hasError = false;
+
+	if (m_defaultShader == nullptr || fileDir.empty())
+	{
+		hasError = true;
+	}
+
+	//hasError = true;
+
+	if (!hasError)
+	{
+		Model* m = new Model(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), m_defaultShader);
+		hasError = m == nullptr;
+
+		if (!hasError)
+		{
+			hasError = !m->Load(fileDir.c_str());
+
+			if (!hasError)
+			{
+				AddModel(m);
+			}
+		}
+	}
+
+	if (hasError)
+	{
+		errorMsg += "An error occurred loading model at: " + fileDir + "\n";
+		m_currentModelError = errorMsg;
+	}
+
+	return hasError;
+}
+
+void Scene::EvaluateLights()
+{
+	// Check which lights will be available, max lights will be 8 based off of which ones are enabled
+	if (m_availableLights.size() == 0)
+	{
+		Light* light = nullptr;
+
+		for (int i = 0; i < m_lights.size(); i++)
+		{
+			light = dynamic_cast<Light*>(m_lights[i]);
+
+			if (light != nullptr)
+			{
+				if (light->m_enabled && m_availableLights.size() < 8)
+				{
+					m_availableLights.push_back(light);
+					m_maxLightsReached = false;
+				}
+				else if (m_availableLights.size() >= 8)
+				{
+					light->m_enabled = false;
+					m_maxLightsReached = true;
+				}
+			}
+		}
+	}
 }
 
 glm::mat4 Scene::GetProjectionMatrix()

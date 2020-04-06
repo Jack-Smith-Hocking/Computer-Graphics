@@ -5,18 +5,23 @@
 #include <glm/ext.hpp>
 #include "Scene.h"
 #include "imgui.h"
+#include <string>
 
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
 using aie::Gizmos;
 
+glm::vec4 g_selectedColour = glm::vec4(1, 0, 0, 0.2f);
+
 unsigned int g_windowHeight;
 unsigned int g_windowWidth;
 
-glm::vec4 g_selectedColour = glm::vec4(1, 0, 0, 0.2f);
-
 int g_gridSize;
+
+std::string g_soulSpearDir = "./models/soulspear/soulspear.obj";
+std::string g_bunnyDir = "./models/Bunny.obj";
+std::string g_dragonDir = "./models/Dragon.obj";
 
 Application3D::Application3D() {
 
@@ -72,17 +77,17 @@ bool Application3D::startup() {
 
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
-	m_scene = new Scene(new Camera());
+	m_scene = new Scene(new Camera(), m_phongTextured);
 	m_scene->AddLight(m_light);
 	m_scene->AddLight(m_light2);
 
 	m_spear = new Model(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), m_phongTextured);
-	m_spear->Load("./models/soulspear/soulspear.obj");
+	m_spear->Load(g_soulSpearDir.c_str());
 
 	m_scene->AddModel(m_spear);
 
 	m_spear = new Model(glm::vec3(5, 0, 5), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), m_phongTextured);
-	m_spear->Load("./models/soulspear/soulspear.obj");
+	m_spear->Load(g_soulSpearDir.c_str());
 
 	m_scene->AddModel(m_spear);
 

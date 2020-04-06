@@ -19,7 +19,7 @@ Camera::Camera()
 
 void Camera::Update(float deltaTime)
 {
-	DrawMenu();
+	UpdateImGui();
 
 	float thetaR = glm::radians(m_theta);
 	float phiR = glm::radians(m_phi);
@@ -85,8 +85,6 @@ void Camera::Update(float deltaTime)
 
 	// Add Gizmos
 	{
-		glm::vec2 mousePos = glm::vec2(g_windowWidth / 2, g_windowHeight / 2);
-
 		if (m_debugInfo.showDebug)
 		{
 			aie::Gizmos::addLine(m_debugInfo.position, m_debugInfo.position + m_debugInfo.forward * 100.0f, m_debugInfo.lineColour);
@@ -98,12 +96,14 @@ void Camera::Update(float deltaTime)
 
 		if (m_crosshairInfo.showCrosshair)
 		{
+			glm::vec2 mousePos = glm::vec2(g_windowWidth / 2, g_windowHeight / 2);
+
 			aie::Gizmos::add2DCircle(mousePos, m_crosshairInfo.size, 12, m_crosshairInfo.colour);
 		}
 	}
 }
 
-void Camera::DrawMenu()
+void Camera::UpdateImGui()
 {
 	ImGui::Begin("Camera Settings");
 

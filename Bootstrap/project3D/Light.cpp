@@ -28,12 +28,12 @@ void Light::Update(float deltaTime)
 
 		ImGui::SliderFloat("Intensity", &m_intensity, 0, 100);
 
+		ImGuiFunctions::CloseSection(1, 1, true, true);
+
 		if (ImGui::Button("Delete", ImVec2(50, 20)))
 		{
 			m_attemptDelete = true;
 		}
-
-		ImGuiFunctions::CloseSection(1, 1, true, true);
 
 		ImGui::End();
 	}

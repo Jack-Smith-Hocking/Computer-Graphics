@@ -40,10 +40,10 @@ void Model::Update(float deltaTime)
 			ImGuiFunctions::OpenSection(0, 0, true, false);
 
 			ImGui::SliderFloat("Collision Radius", &m_radius, 0.1f, 10);
-			ImGuiFunctions::ResetButton<float>("Reset Radius", m_radius, 1, resetSize);
+			ImGuiFunctions::ButtonSet<float>("Reset Radius", m_radius, 1, resetSize);
 
 			ImGui::SliderFloat3("Offset", &m_offset[0], -10, 10);
-			ImGuiFunctions::ResetButton("Reset Offset", m_offset, glm::vec3(0, 0, 0), resetSize);
+			ImGuiFunctions::ButtonSet("Reset Offset", m_offset, glm::vec3(0, 0, 0), resetSize);
 
 			ImGuiFunctions::CloseSection(0, 2, true, true);
 		}
@@ -56,26 +56,28 @@ void Model::Update(float deltaTime)
 			if (m_useUniformScale)
 			{
 				ImGui::SliderFloat("Uniform Scale", &m_uniformScale, 0, 10);
-				ImGuiFunctions::ResetButton<float>("Reset UScale", m_uniformScale, 1, resetSize);
+				ImGuiFunctions::ButtonSet<float>("Reset UScale", m_uniformScale, 1, resetSize);
 
 				m_scale = glm::vec3(m_uniformScale, m_uniformScale, m_uniformScale);
 			}
 			else
 			{
 				ImGui::SliderFloat3("Scale", &m_scale[0], 0, 10);
-				ImGuiFunctions::ResetButton<glm::vec3>("Reset Scale", m_scale, glm::vec3(0, 0, 0), resetSize);
+				ImGuiFunctions::ButtonSet<glm::vec3>("Reset Scale", m_scale, glm::vec3(0, 0, 0), resetSize);
 			}
 
 			ImGuiFunctions::CloseSection(0, 2, true, true);
 		}
 
 		ImGui::SliderFloat3("Rotation", &m_euler[0], 0, 360);
-		ImGuiFunctions::ResetButton("Reset Rotation", m_euler, glm::vec3(0, 0, 0), resetSize);
+		ImGuiFunctions::ButtonSet("Reset Rotation", m_euler, glm::vec3(0, 0, 0), resetSize);
 
 		ImGui::SliderFloat3("Position", &m_position[0], -g_gridSize, g_gridSize);
-		ImGuiFunctions::ResetButton("Reset Position", m_position, glm::vec3(0, 0, 0), resetSize);
+		ImGuiFunctions::ButtonSet("Reset Position", m_position, glm::vec3(0, 0, 0), resetSize);
 
 		ImGuiFunctions::CloseSection(1, 1, true, true);
+
+		ImGuiFunctions::ButtonSet("Delete", m_attemptDelete, true, ImVec2(50, 20));
 
 		ImGui::End();
 	}
@@ -89,7 +91,7 @@ void Model::Draw(Scene* scene)
 	
 	if (scene != nullptr)
 	{
-		scene->UseShader(m_shader);
+		scene->BindShaderUniforms(m_shader);
 	}
 
 	auto pvm = scene->GetProjectionMatrix() * scene->GetViewMatrix() * m_transform;

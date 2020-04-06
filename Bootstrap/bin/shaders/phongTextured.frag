@@ -5,8 +5,6 @@ in vec4 vPosition;
 in vec3 vNormal;
 in vec2 vTexCoord;
 
-uniform vec3 Ia; // Ambient light colour
-
 uniform vec3 LightColour[8]; 
 uniform vec3 LightPosition[8];
 uniform float LightIntensity[8];
@@ -60,6 +58,8 @@ void main()
 	float distanceSqrd = 0;
 	float attenuation = 0;
 
+	vec3 ambient = vec3(0, 0, 0);
+
 	for (int i = 0; i < 8; i++)
 	{
 		toLight = vec3(vPosition) - LightPosition[i];
@@ -75,10 +75,10 @@ void main()
 
 		diffuse += LightColour[i] * Kd * lambertTerm;
 		specular += LightColour[i] * Ks * specularTerm;
-	}
 
-	// Calculate each colour property
-	vec3 ambient = Ia * Ka;
+		// Calculate each colour property
+		ambient = LightColour[i] * Ka;
+	}
 
 	// output lambert as grayscale
 	FragColour = vec4( ambient + diffuse + specular, 1 ) + texture( diffuseTexture, vTexCoord );

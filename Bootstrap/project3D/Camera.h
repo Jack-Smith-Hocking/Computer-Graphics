@@ -11,7 +11,7 @@ public:
 
 	struct DebugInformation
 	{
-		bool showDebug = true;
+		bool showDebug = false;
 		bool showSphere = true;
 
 		glm::vec3 position;
@@ -32,7 +32,7 @@ public:
 
 	void Update(float deltaTime);
 
-	void DrawMenu();
+	void UpdateImGui();
 
 	glm::vec3 GetForward();
 	void SelectTarget();
