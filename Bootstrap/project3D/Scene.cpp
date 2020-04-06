@@ -248,6 +248,8 @@ void Scene::BindShaderUniforms(aie::ShaderProgram* shader)
 	glm::vec3 pos[8];
 	glm::vec3 col[8];
 
+	int numLights = m_availableLights.size();
+
 	float in[8];
 
 	int i = 0;
@@ -259,21 +261,15 @@ void Scene::BindShaderUniforms(aie::ShaderProgram* shader)
 
 		in[i] = m_availableLights[i]->m_intensity;
 	}
-	for (i; i < 8; i++)
-	{
-		pos[i] = glm::vec3(0, 0, 0);
-		col[i] = glm::vec3(0, 0, 0);
-
-		in[i] = 0;
-	}
 
 	shader->bind();
 
 	// Bind relevant information
-	shader->bindUniform("LightPosition", 8, pos);
-	shader->bindUniform("LightColour", 8, col);
+	shader->bindUniform("LightPosition", numLights, pos);
+	shader->bindUniform("LightColour", numLights, col);
+	shader->bindUniform("LightIntensity", numLights, in);
 
-	shader->bindUniform("LightIntensity", 8, in);
+	shader->bindUniform("NumLights", numLights);
 
 	shader->bindUniform("CameraPosition", glm::vec3(glm::inverse(m_mainCamera->GetViewMatrix())[3]));
 }

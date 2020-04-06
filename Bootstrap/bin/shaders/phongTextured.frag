@@ -9,6 +9,8 @@ uniform vec3 LightColour[8];
 uniform vec3 LightPosition[8];
 uniform float LightIntensity[8];
 
+uniform int NumLights;
+
 uniform vec3 Ka; // Ambient material colour
 uniform vec3 Kd; // Diffuse material colour
 uniform vec3 Ks; // Specular material colour
@@ -60,7 +62,7 @@ void main()
 
 	vec3 ambient = vec3(0, 0, 0);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NumLights; i++)
 	{
 		toLight = vec3(vPosition) - LightPosition[i];
 		lightDirection =  normalize(toLight);
@@ -70,14 +72,14 @@ void main()
 
 		intensity = (LightColour[i] * LightIntensity[i]) * attenuation;
 
-		lambertTerm += DiffuseLight(N, lightDirection, intensity);
-		specularTerm += SpecularLight(N, lightDirection, intensity); 
+		lambertTerm = DiffuseLight(N, lightDirection, intensity);
+		specularTerm = SpecularLight(N, lightDirection, intensity); 
 
 		diffuse += LightColour[i] * Kd * lambertTerm;
 		specular += LightColour[i] * Ks * specularTerm;
 
 		// Calculate each colour property
-		ambient = LightColour[i] * Ka;
+		ambient += LightColour[i] * Ka;
 	}
 
 	// output lambert as grayscale
