@@ -42,54 +42,46 @@ bool Application3D::startup() {
 	m_viewMatrix = glm::lookAt(vec3(10), vec3(0), vec3(0, 1, 0));
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.f);
 
-	m_phongTextured = new aie::ShaderProgram();
-
-	// Load phong shader files
-	m_phongTextured->loadShader(aie::eShaderStage::VERTEX, "./shaders/phongTextured.vert");
-	m_phongTextured->loadShader(aie::eShaderStage::FRAGMENT, "./shaders/phongTextured.frag");
-
+	aie::ShaderProgram* untextured = new aie::ShaderProgram();
+	untextured->loadShader(aie::eShaderStage::VERTEX, "./shaders/phongUntextured.vert");
+	untextured->loadShader(aie::eShaderStage::FRAGMENT, "./shaders/phongUntextured.frag");
 	// Check if there was any errors linking the shader files
-	if (m_phongTextured->link() == false)
+	if (untextured->link() == false)
 	{
-		printf("TexturedShader Error: %s\n", m_phongTextured->getLastError());
+		printf("UntexturedShader Error: %s\n", untextured->getLastError());
 		return false;
 	}
 
-	//if (m_spearMesh.load("./models/soulspear/soulspear.obj", true, true) == false)
-	//{
-	//	printf("Soulspear Mesh Error!\n");
-	//	return false;
-	//}
+	aie::ShaderProgram* textured = new aie::ShaderProgram();
+	textured->loadShader(aie::eShaderStage::VERTEX, "./shaders/normalMap.vert");
+	textured->loadShader(aie::eShaderStage::FRAGMENT, "./shaders/normalMap.frag");
+	// Check if there was any errors linking the shader files
+	if (textured->link() == false)
+	{
+		printf("TexturedShader Error: %s\n", textured->getLastError());
+		return false;
+	}
 
-	//m_spearTransform =
-	//{
-	//	1, 0, 0, 0,
-	//	0, 1, 0, 0,
-	//	0, 0, 1, 0,
-	//	0, 0, 0, 1
-	//};
+	m_scene = new Scene(new Camera());
+	m_scene->SetShaders(textured, untextured);
 
-	m_light = new Light(glm::vec3(-10, 0, 0), glm::vec3(0, 1, 0));
-	m_light->m_intensity = 20;
+	Light* light = new Light(glm::vec3(0, -20, 0), glm::vec3(1, 1, 1));
+	light->m_intensity = 1000;
+	m_scene->AddLight(light);
 
-	m_light2 = new Light(glm::vec3(10, 0, 0), glm::vec3(1, 0, 0));
-	m_light2->m_intensity = 20;
+	Light* light2 = new Light(glm::vec3(0, 20, 0), glm::vec3(1, 1, 1));
+	light2->m_intensity = 1000;
+	m_scene->AddLight(light2);
 
-	m_ambientLight = { 0.25f, 0.25f, 0.25f };
+	Model* spearModel = new Model(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), textured);
+	spearModel->Load(g_soulSpearDir.c_str());
 
-	m_scene = new Scene(new Camera(), m_phongTextured);
-	m_scene->AddLight(m_light);
-	m_scene->AddLight(m_light2);
+	m_scene->AddModel(spearModel);
 
-	m_spear = new Model(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), m_phongTextured);
-	m_spear->Load(g_soulSpearDir.c_str());
+	spearModel = new Model(glm::vec3(5, 0, 5), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), textured);
+	spearModel->Load(g_soulSpearDir.c_str());
 
-	m_scene->AddModel(m_spear);
-
-	m_spear = new Model(glm::vec3(5, 0, 5), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), m_phongTextured);
-	m_spear->Load(g_soulSpearDir.c_str());
-
-	m_scene->AddModel(m_spear);
+	m_scene->AddModel(spearModel);
 
 	g_windowHeight = getWindowHeight();
 	g_windowWidth = getWindowWidth();

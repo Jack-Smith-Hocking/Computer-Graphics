@@ -3,6 +3,10 @@
 
 in vec4 vPosition;
 in vec3 vNormal;
+in vec2 vTexCoord;
+
+in vec3 vTangent;
+in vec3 vBiTangent;
 
 uniform vec3 LightColour[8]; 
 uniform vec3 LightPosition[8];
@@ -17,6 +21,10 @@ uniform vec3 Ks; // Specular material colour
 uniform vec3 CameraPosition; // Position of the camera
 
 uniform float specularPower; // Material specular power
+
+uniform sampler2D specularTexture;
+uniform sampler2D diffuseTexture;
+uniform sampler2D normalTexture;
 
 out vec4 FragColour;
 
@@ -42,6 +50,13 @@ void main()
 	// ensure normal and light direction are normalised
 	vec3 N = normalize(vNormal);
 
+	vec3 T = normalize(vTangent);
+	vec3 B = normalize(vBiTangent);
+
+	vec3 texDiffuse = texture( diffuseTexture, vTexCoord ).rgb;
+	vec3 texSpecular = texture( specularTexture, vTexCoord ).rgb;
+	vec3 texNormal = texture( normalTexture, vTexCoord ).rgb;
+
 	vec3 lightDirection= vec3(0, 0, 0);
 	vec3 toLight = vec3(0, 0, 0);
 	vec3 intensity = vec3(0, 0, 0);
@@ -58,6 +73,9 @@ void main()
 	float attenuation = 0;
 
 	vec3 ambient = vec3(0, 0, 0);
+
+	mat3 TBN = mat3(T, B, N);
+	N = TBN * (texNormal * 2 - 1);
 
 	for (int i = 0; i < NumLights; i++)
 	{
@@ -79,6 +97,9 @@ void main()
 		ambient += LightColour[i] * Ka;
 	}
 	
+	diffuse *= texDiffuse;
+	specular *= texSpecular;
+
 	// output lambert as grayscale
 	FragColour = vec4( ambient + diffuse + specular, 1 );
 }

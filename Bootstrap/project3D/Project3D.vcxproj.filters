@@ -118,5 +118,14 @@
     <None Include="..\bin\shaders\phongUntextured.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\bin\shaders\normalMap.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\bin\shaders\normalMap.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\bin\models\soulspear\soulspear.mtl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

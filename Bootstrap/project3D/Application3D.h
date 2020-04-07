@@ -28,16 +28,5 @@ protected:
 	glm::mat4				m_viewMatrix;
 	glm::mat4				m_projectionMatrix;
 
-	aie::ShaderProgram*		m_phongTextured = nullptr;
-
-	aie::OBJMesh			m_spearMesh;
-	glm::mat4				m_spearTransform;
-
-	Light*					m_light = nullptr;
-	Light*					m_light2 = nullptr;
-	glm::vec3				m_ambientLight = glm::vec3(1, 1, 1);
-
 	Scene*					m_scene = nullptr;
-
-	Model*					m_spear = nullptr;
 };

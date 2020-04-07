@@ -25,8 +25,7 @@ void Light::Update(float deltaTime)
 		ImGui::SliderFloat3("Position", &m_position[0], -g_gridSize, g_gridSize);
 		ImGui::SliderFloat3("Colour", &m_colour[0], 0, 1);
 
-
-		ImGui::SliderFloat("Intensity", &m_intensity, 0, 100);
+		ImGui::SliderFloat("Intensity", &m_intensity, 0, 1000);
 
 		ImGuiFunctions::CloseSection(1, 1, true, true);
 
@@ -38,7 +37,7 @@ void Light::Update(float deltaTime)
 		ImGui::End();
 	}
 
-	m_radius = 0.5f + m_intensity * 0.01f;
+	m_radius = 0.5f + (m_intensity / 1000);
 	
 	if (!m_hide)
 	{

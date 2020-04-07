@@ -14,10 +14,12 @@ class Scene
 {
 public:
 
-	Scene(Camera* camera, aie::ShaderProgram* defaultShader);
+	Scene(Camera* camera);
 
 	void Update(float deltaTime);
 	void Draw();
+
+	void SetShaders(aie::ShaderProgram* textured, aie::ShaderProgram* untextured);
 
 	void UpdateImGui();
 	void LoadModelMenu();
@@ -32,7 +34,7 @@ public:
 
 	void BindShaderUniforms(aie::ShaderProgram* shader);
 
-	bool LoadModel(std::string fileDir, std::string& errorMsg);
+	bool LoadModel(std::string fileDir, aie::ShaderProgram* shader, std::string& errorMsg);
 
 	void EvaluateLights();
 
@@ -60,7 +62,10 @@ private:
 	DebugInformation m_debugInfo;
 
 	Camera* m_mainCamera = nullptr;
-	aie::ShaderProgram* m_defaultShader = nullptr;
+	
+	aie::ShaderProgram* m_texturedShader = nullptr;
+	aie::ShaderProgram* m_untexturedShader = nullptr;
+
 	std::vector<Light*> m_availableLights; 
 
 	std::string m_currentModelError = "";

@@ -21,7 +21,7 @@ extern std::string g_soulSpearDir;
 extern std::string g_bunnyDir;
 extern std::string g_dragonDir;
 
-Scene::Scene(Camera* camera, aie::ShaderProgram* defaultShader) : m_mainCamera(camera), m_defaultShader(defaultShader)
+Scene::Scene(Camera* camera) : m_mainCamera(camera)
 {
 	if (camera == nullptr)
 	{
@@ -69,6 +69,12 @@ void Scene::Draw()
 	}
 
 	m_availableLights.clear();
+}
+
+void Scene::SetShaders(aie::ShaderProgram* textured, aie::ShaderProgram* untextured)
+{
+	m_texturedShader = textured;
+	m_untexturedShader = untextured;
 }
 
 void Scene::UpdateImGui()
@@ -139,19 +145,19 @@ void Scene::LoadModelMenu()
 
 	static std::string errorMsg;
 
-	if (ImGui::Button("Load Spear", ImVec2(75, 30)))
+	if (ImGui::Button("Load Spear", ImVec2(85, 30)))
 	{
-		LoadModel(g_soulSpearDir, errorMsg);
+		LoadModel(g_soulSpearDir, m_texturedShader, errorMsg);
 	}
 
-	if (ImGui::Button("Load Bunny", ImVec2(75, 30)))
+	if (ImGui::Button("Load Bunny", ImVec2(85, 30)))
 	{
-		LoadModel(g_bunnyDir, errorMsg);
+		LoadModel(g_bunnyDir, m_untexturedShader, errorMsg);
 	}
 
-	if (ImGui::Button("Load Dragon", ImVec2(75, 30)))
+	if (ImGui::Button("Load Dragon", ImVec2(85, 30)))
 	{
-		LoadModel(g_dragonDir, errorMsg);
+		LoadModel(g_dragonDir, m_untexturedShader, errorMsg);
 	}
 
 	ImGuiFunctions::CloseSection(1, 1, true, true);
@@ -276,11 +282,11 @@ void Scene::BindShaderUniforms(aie::ShaderProgram* shader)
 	shader->bindUniform("CameraPosition", glm::vec3(glm::inverse(m_mainCamera->GetViewMatrix())[3]));
 }
 
-bool Scene::LoadModel(std::string fileDir, std::string& errorMsg)
+bool Scene::LoadModel(std::string fileDir, aie::ShaderProgram* shader, std::string& errorMsg)
 {
 	bool hasError = false;
 
-	if (m_defaultShader == nullptr || fileDir.empty())
+	if (shader == nullptr || fileDir.empty())
 	{
 		hasError = true;
 	}
@@ -289,7 +295,7 @@ bool Scene::LoadModel(std::string fileDir, std::string& errorMsg)
 
 	if (!hasError)
 	{
-		Model* m = new Model(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), m_defaultShader);
+		Model* m = new Model(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), shader);
 		hasError = m == nullptr;
 
 		if (!hasError)

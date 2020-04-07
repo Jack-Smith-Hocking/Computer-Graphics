@@ -199,6 +199,9 @@
     <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\bin\models\soulspear\soulspear.mtl" />
+    <None Include="..\bin\shaders\normalMap.frag" />
+    <None Include="..\bin\shaders\normalMap.vert" />
     <None Include="..\bin\shaders\phongTextured.frag" />
     <None Include="..\bin\shaders\phongTextured.vert" />
     <None Include="..\bin\shaders\phongUntextured.frag" />
