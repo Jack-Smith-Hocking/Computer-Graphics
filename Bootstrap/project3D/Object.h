@@ -12,11 +12,11 @@ public:
 	virtual void Update(float deltaTime);
 	virtual void Draw(Scene* scene);
 
-	void DeleteObject();
+	virtual void DeleteObject();
 
 	void UpdateTransform();
 
-	bool AttemptDelete() { return m_attemptDelete; };
+	bool ReadyForDeletion() { return m_attemptDelete; };
 
 	glm::vec3 m_position;
 	glm::vec3 m_euler;

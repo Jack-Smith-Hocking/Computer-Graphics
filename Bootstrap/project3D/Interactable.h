@@ -20,9 +20,9 @@ public:
 
 	glm::vec3 GetOffsetPosition() { return m_position + m_offset; };
 
-protected:
+	virtual void DeleteObject() override { Object::DeleteObject(); };
 
-	static void ImGuiResetFormatting(bool open);
+protected:
 
 	float m_radius = 2;
 	

@@ -27,8 +27,8 @@ public:
 	void AddLight(Light* light);
 	void AddModel(Model* model);
 
-	void AttemptToDelete(std::vector<Interactable*>& objList, Object* obj);
-	void SafelyCheckToDelete(std::vector<Interactable*>& objs);
+	void AttemptToDelete(std::vector<Object*>& objList, Object* obj);
+	void SafelyCheckToDelete(std::vector<Object*>& objs);
 
 	void BindShaderUniforms(aie::ShaderProgram* shader);
 
@@ -36,8 +36,8 @@ public:
 
 	void EvaluateLights();
 
-	std::vector<Interactable*> m_models;
-	std::vector<Interactable*> m_lights;
+	std::vector<Object*> m_models;
+	std::vector<Object*> m_lights;
 
 	glm::mat4 GetProjectionMatrix();
 	glm::mat4 GetViewMatrix();

@@ -19,6 +19,11 @@ Camera::Camera()
 
 void Camera::Update(float deltaTime)
 {
+	if (m_currentMenu != nullptr && m_currentMenu->ReadyForDeletion())
+	{
+		m_currentMenu = nullptr;
+	}
+
 	UpdateImGui();
 
 	float thetaR = glm::radians(m_theta);
@@ -32,6 +37,8 @@ void Camera::Update(float deltaTime)
 	float moveSpeed = m_moveSpeed * deltaTime;
 	float scrollSpeed = m_scrollSpeed * deltaTime;
 
+	// The amount the user scrolled by this frame, calculated by the total scroll - the scroll from last frame
+	// Because aie::Input accumulates scroll over frames rather than clearing, which means it isn't 0 when stopped scrolling
 	float scrollThisFrame = m_input->getMouseScroll() - m_scrollWheelMove;
 	m_scrollWheelMove = m_input->getMouseScroll();
 
@@ -159,6 +166,7 @@ void Camera::SelectTarget()
 		if (m_currentMenu != nullptr)
 		{
 			m_currentMenu->OffClick();
+			m_currentMenu = nullptr;
 		}
 
 		glm::vec3 dir = GetForward();
@@ -191,7 +199,7 @@ void Camera::SelectTarget()
 	}
 }
 
-Interactable* Camera::EvaluateTargets(const std::vector<Interactable*>& interactables, const glm::vec3& dir, float& closestDist)
+Interactable* Camera::EvaluateTargets(const std::vector<Object*>& interactables, const glm::vec3& dir, float& closestDist)
 {
 	// Vector between the ray origin and the centre of the collision sphere
 	glm::vec3 L;
@@ -204,8 +212,16 @@ Interactable* Camera::EvaluateTargets(const std::vector<Interactable*>& interact
 	// Start point of the ray
 	glm::vec3 origin = m_position;
 
-	for each (Interactable* interactable in interactables)
+	Interactable* interactable = nullptr;
+
+	for each (Object* obj in interactables)
 	{
+		interactable = dynamic_cast<Interactable*>(obj);
+		if (interactable == nullptr)
+		{
+			continue;
+		}
+
 		L = interactable->GetOffsetPosition() - m_position;
 		closestDistToCentre = glm::dot(L, dir);
 

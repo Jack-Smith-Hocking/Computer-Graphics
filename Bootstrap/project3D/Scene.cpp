@@ -35,6 +35,9 @@ Scene::Scene(Camera* camera, aie::ShaderProgram* defaultShader) : m_mainCamera(c
 
 void Scene::Update(float deltaTime)
 {
+	SafelyCheckToDelete(m_lights);
+	SafelyCheckToDelete(m_models);
+
 	UpdateImGui();
 
 	m_mainCamera->Update(deltaTime);
@@ -70,9 +73,6 @@ void Scene::Draw()
 
 void Scene::UpdateImGui()
 {
-	SafelyCheckToDelete(m_lights);
-	SafelyCheckToDelete(m_models);
-
 	if (!m_debugInfo.hideErrorPanel)
 	{
 		ImGuiFunctions::DisplayError("Warning! Max number of lights enabled! All new lights will be disabled!", ImVec4(1, 1, 0, 1), m_maxLightsReached);
@@ -201,7 +201,7 @@ void Scene::AddModel(Model* model)
 	}
 }
 
-void Scene::AttemptToDelete(std::vector<Interactable*>& objList, Object* obj)
+void Scene::AttemptToDelete(std::vector<Object*>& objList, Object* obj)
 {
 	if (obj != nullptr)
 	{
@@ -209,14 +209,14 @@ void Scene::AttemptToDelete(std::vector<Interactable*>& objList, Object* obj)
 	}
 }
 
-void Scene::SafelyCheckToDelete(std::vector<Interactable*>& objs)
+void Scene::SafelyCheckToDelete(std::vector<Object*>& objs)
 {
-	std::vector <Object* > objsToDelete;
+	std::vector<Object*> objsToDelete;
 
 	// Iterate through list to check if any are marked for deleting
 	for each (Object* obj in objs)
 	{
-		if (obj->AttemptDelete())
+		if (obj->ReadyForDeletion())
 		{
 			objsToDelete.push_back(obj);
 		}
@@ -229,6 +229,8 @@ void Scene::SafelyCheckToDelete(std::vector<Interactable*>& objs)
 		if (objsToDelete[i] != nullptr)
 		{
 			AttemptToDelete(objs, objsToDelete[i]);
+
+			objsToDelete[i]->DeleteObject();
 		}
 	}
 }

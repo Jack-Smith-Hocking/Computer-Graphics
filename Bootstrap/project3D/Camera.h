@@ -4,6 +4,7 @@
 
 class Interactable;
 class Scene;
+class Object;
 
 class Camera
 {
@@ -36,7 +37,7 @@ public:
 
 	glm::vec3 GetForward();
 	void SelectTarget();
-	Interactable* EvaluateTargets(const std::vector<Interactable*>& interactables, const glm::vec3& dir, float& closestDist);
+	Interactable* EvaluateTargets(const std::vector<Object*>& interactables, const glm::vec3& dir, float& closestDist);
 
 	void SetScene(Scene* scene);
 
