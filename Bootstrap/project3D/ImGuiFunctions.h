@@ -7,7 +7,7 @@ static class ImGuiFunctions
 {
 public:
 
-	// When button is pressed it will set the input 'value' to the input 'valueDefault'
+	// When button is pressed it will set 'value' to 'valueDefault'
 	template <typename T>
 	static void ButtonSet(std::string title, T& value, T valueDefault, ImVec2 size, bool sameLine = true); 
 

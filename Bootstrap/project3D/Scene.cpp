@@ -29,46 +29,44 @@ Scene::Scene(Camera* camera) : m_mainCamera(camera)
 	}
 	else
 	{
+		// Tells the Camera that it is operating within this Scene
 		camera->SetScene(this);
 	}
 }
 
 void Scene::Update(float deltaTime)
 {
-	SafelyCheckToDelete(m_lights);
-	SafelyCheckToDelete(m_models);
+	SafelyCheckToDelete(m_lights); // Check if any Lights are marked for deletion
+	SafelyCheckToDelete(m_models); // Check if any Models are marked for deletion
 
 	UpdateImGui();
 
 	m_mainCamera->Update(deltaTime);
 
-	for each (Light* light in m_lights)
+	for each (Light* light in m_lights) // Update Lights
 	{
 		light->Update(deltaTime);
 		light->ShowCollider(m_debugInfo.showColliders);
 	}
-	for each (Interactable * model in m_models)
+	for each (Interactable * model in m_models) // Update Models
 	{
 		model->Update(deltaTime);
 		model->ShowCollider(m_debugInfo.showColliders);
-	}
-
-	if (m_models.size() == 0)
-	{
-		EvaluateLights();
 	}
 }
 
 void Scene::Draw()
 {
-	DrawGrid(g_gridSize, m_gridInfo.drawGrid);
+	DrawGrid(g_gridSize, m_gridInfo.drawGrid); // Draw grid
 
-	for each (Interactable* model in m_models)
+	EvaluateLights();
+
+	for each (Interactable* model in m_models) // Draw Models
 	{
 		model->Draw(this);
 	}
 
-	m_availableLights.clear();
+	m_availableLights.clear(); // Clear the available Lights
 }
 
 void Scene::SetShaders(aie::ShaderProgram* textured, aie::ShaderProgram* untextured)
@@ -102,7 +100,7 @@ void Scene::UpdateImGui()
 	ImGui::Checkbox("Show Colliders", &m_debugInfo.showColliders);
 	ImGui::Checkbox("Show Grid", &m_gridInfo.drawGrid);
 
-	if (m_gridInfo.drawGrid)
+	if (m_gridInfo.drawGrid) // Grid settings
 	{
 		ImGuiFunctions::OpenSection(0, 0, true, false);
 
@@ -250,8 +248,6 @@ void Scene::BindShaderUniforms(aie::ShaderProgram* shader)
 		return;
 	}
 
-	EvaluateLights();
-
 	// Create simple passable arrays
 	glm::vec3 pos[8];
 	glm::vec3 col[8];
@@ -291,8 +287,6 @@ bool Scene::LoadModel(std::string fileDir, aie::ShaderProgram* shader, std::stri
 		hasError = true;
 	}
 
-	//hasError = true;
-
 	if (!hasError)
 	{
 		Model* m = new Model(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), shader);
@@ -309,7 +303,7 @@ bool Scene::LoadModel(std::string fileDir, aie::ShaderProgram* shader, std::stri
 		}
 	}
 
-	if (hasError)
+	if (hasError) // Add a message to the error log
 	{
 		errorMsg += "An error occurred loading model at: " + fileDir + "\n";
 		m_currentModelError = errorMsg;
@@ -320,7 +314,7 @@ bool Scene::LoadModel(std::string fileDir, aie::ShaderProgram* shader, std::stri
 
 void Scene::EvaluateLights()
 {
-	// Check which lights will be available, max lights will be 8 based off of which ones are enabled
+	// Check which Lights will be available, max Lights will be 8 based off of which ones are enabled
 	if (m_availableLights.size() == 0)
 	{
 		Light* light = nullptr;

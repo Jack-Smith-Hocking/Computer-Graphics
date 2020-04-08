@@ -18,15 +18,15 @@ public:
 
 	bool ReadyForDeletion() { return m_attemptDelete; };
 
-	glm::vec3 m_position;
-	glm::vec3 m_euler;
-	glm::vec3 m_scale;
+	glm::vec3 m_position;				// Position of the Object in world space
+	glm::vec3 m_euler;					// Rotation of the Object in world space
+	glm::vec3 m_scale;					// Scale of the Object in world space
 
 protected:
-	bool m_attemptDelete = false;
-	bool m_hide = false;
+	bool m_attemptDelete = false;		// Whether the Object is marked for deletion or not
+	bool m_hide = false;				// Whether the Object should draw itself or not
 
-	glm::mat4 m_transform;
+	glm::mat4 m_transform;				// Transform that wraps the position, rotation and scale into a mat4
 };
 
 

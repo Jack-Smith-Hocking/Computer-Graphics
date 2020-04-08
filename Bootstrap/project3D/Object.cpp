@@ -27,6 +27,7 @@ void Object::UpdateTransform()
 {
 	float rad = 6.28f / 360.0f;
 
+	// Calculate the transform based off of the position, rotation and scale of the Object
 	m_transform = glm::translate(glm::mat4(1), m_position)
 		* glm::rotate(glm::mat4(1), m_euler.z * rad, glm::vec3(0, 0, 1))
 		* glm::rotate(glm::mat4(1), m_euler.y * rad, glm::vec3(0, 1, 0))
