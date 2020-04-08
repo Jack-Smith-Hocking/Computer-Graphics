@@ -45,12 +45,12 @@ void Scene::Update(float deltaTime)
 	for each (Light* light in m_lights)
 	{
 		light->Update(deltaTime);
-		light->ToggleCollider(m_debugInfo.showColliders);
+		light->ShowCollider(m_debugInfo.showColliders);
 	}
 	for each (Interactable * model in m_models)
 	{
 		model->Update(deltaTime);
-		model->ToggleCollider(m_debugInfo.showColliders);
+		model->ShowCollider(m_debugInfo.showColliders);
 	}
 
 	if (m_models.size() == 0)

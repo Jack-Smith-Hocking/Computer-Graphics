@@ -19,6 +19,7 @@ Camera::Camera()
 
 void Camera::Update(float deltaTime)
 {
+	// If the currently selected Interactable is marked for deletion, then clear it
 	if (m_currentMenu != nullptr && m_currentMenu->ReadyForDeletion())
 	{
 		m_currentMenu = nullptr;
@@ -26,7 +27,8 @@ void Camera::Update(float deltaTime)
 
 	UpdateImGui();
 
-	float thetaR = glm::radians(m_theta);
+	// Convert to radians
+	float thetaR = glm::radians(m_theta); 
 	float phiR = glm::radians(m_phi);
 
 	// Calculate the forwards for the right axis and up axis for the camera
@@ -161,24 +163,27 @@ glm::vec3 Camera::GetForward()
 
 void Camera::SelectTarget()
 {
+	// Check if this Camera is being used in a Scene
 	if (m_scene != nullptr)
 	{
+		// if there is a currently selected Interactable, tell it that it has been clicked off of
 		if (m_currentMenu != nullptr)
 		{
 			m_currentMenu->OffClick();
 			m_currentMenu = nullptr;
 		}
 
+		// Get the Camera's forward. This is where we will be the direction we ray cast
 		glm::vec3 dir = GetForward();
 		
 		m_debugInfo.forward = dir;
 		m_debugInfo.position = m_position;
 
+		// The closes viable Interactable from m_position
 		Interactable* closestInteractive = nullptr;
-
-		// The closes viable light from m_position
 		float closestDist = 1000000000;
 
+		// Check which Interactables will be hit, and which will be the one affected
 		closestInteractive = EvaluateTargets(m_scene->m_lights, dir, closestDist);
 		Interactable* temp = EvaluateTargets(m_scene->m_models, dir, closestDist);
 
@@ -187,6 +192,7 @@ void Camera::SelectTarget()
 			closestInteractive = temp;
 		}
 
+		// If an Interactable was selected, tell it that it was clicked
 		if (closestInteractive != nullptr)
 		{
 			m_currentMenu = closestInteractive;
@@ -214,9 +220,12 @@ Interactable* Camera::EvaluateTargets(const std::vector<Object*>& interactables,
 
 	Interactable* interactable = nullptr;
 
+	// This will explain it better than i would be able to:
+	// https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
+
 	for each (Object* obj in interactables)
 	{
-		interactable = dynamic_cast<Interactable*>(obj);
+		interactable = dynamic_cast<Interactable*>(obj); // Cast to an Interactable
 		if (interactable == nullptr)
 		{
 			continue;
@@ -259,11 +268,8 @@ void Camera::SetScene(Scene* scene)
 
 glm::mat4 Camera::GetViewMatrix()
 {
-	float thetaR = glm::radians(m_theta);
-	float phiR = glm::radians(m_phi);
-
 	// Calculate forward of the camera
-	glm::vec3 forward(cos(phiR) * cos(thetaR), sin(phiR), cos(phiR) * sin(thetaR));
+	glm::vec3 forward = GetForward();
 
 	return glm::lookAt(m_position, m_position + forward, glm::vec3(0, 1, 0));
 }

@@ -14,16 +14,17 @@ public:
 
 	~Model() override;
 
-	void Update(float deltaTime) override;
 	void Draw(Scene* scene) override;
+
+	void UpdateImGui() override;
 
 	bool Load(std::string fileDir);
 
 protected:
-
-	bool m_useUniformScale = true;
-
-	float m_uniformScale = 1;
+	
+	bool m_useUniformScale = true;				// Determines whether to use the same scalar value to scale the model by
+	
+	float m_uniformScale = 1;					// For scaling a model's xyz by the same scalar value
 
 	aie::OBJMesh* m_mesh = nullptr;
 	aie::ShaderProgram* m_shader = nullptr;
